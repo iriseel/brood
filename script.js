@@ -1,51 +1,5 @@
 const textDiv = document.querySelector(".text");
 
-const babyImgs = [
-    "imgs/baby/baby1.jpeg",
-    "imgs/baby/baby2.jpeg",
-    "imgs/baby/newborn.jpeg",
-    "imgs/baby/vernix_feet.jpeg",
-    "imgs/baby/vernix1.jpeg",
-    "imgs/baby/vernix2.jpeg",
-    // "imgs/",
-    // "imgs/",
-]
-
-const candleImgs = [
-    "imgs/candle/candle1.gif",
-    "imgs/candle/candle2.gif",
-    "imgs/candle/candle3.gif",
-]
-
-const fireworksImgs = [
-    "imgs/fireworks/july4_fireworks1.jpg",
-    "imgs/fireworks/july4_fireworks2.jpg",
-    "imgs/fireworks/october10_fireworks1.jpg",
-    "imgs/fireworks/october10_fireworks2.jpg",
-]
-
-const migrationImgs = [
-    "imgs/migration/cranes1.jpeg",
-    "imgs/migration/cranes2.jpeg",
-    "imgs/migration/geese.jpeg",
-    "imgs/migration/waders.jpeg",
-]
-
-const perennialsImgs = [
-    "imgs/perennials/chicory.jpeg",
-    "imgs/perennials/dahlia.jpeg",
-    "imgs/perennials/pear.jpeg",
-]
-
-const june4Imgs = [
-    "imgs/hk/victoria_park_2021_1.jpeg",
-    "imgs/hk/victoria_park_2021_2.jpeg",
-    "imgs/hk/victoria_park_2022_1.jpeg",
-    "imgs/hk/victoria_park_2022_2.jpeg",
-    "imgs/hk/victoria_park_2023_1.jpeg",
-
-]
-
 const texts = [
     "One theory was that the disease started when the moths ate through the archives. Perhaps they were attracted by their disuse, all that history unnourished by life. There was no need for book burning when you could just let them mold. From the moths, the history passed to the bees, the cicadas, the butterflies, the roaches, the locusts, and the maggots. No one noticed a difference in their behaviors.",
     "Another theory was that they simply absorbed the memories from all the surfaces of the world, the trash on the streets, the witness trees and building facades and shoddily repaired pavements, the albums and trinkets traded at flea markets.",
@@ -65,85 +19,9 @@ const mothImgs = [
     "imgs/scan_moths/img20231107_17580860_2.png"
 ];
 
-let counter = 0;
-let textCounter = 0;
-let babyImgsCounter = 0;
-let candleImgsCounter = 0;
-let fireworksImgsCounter = 0;
-let migrationImgsCounter = 0;
-let perennialsImgsCounter = 0;
-let june4ImgsCounter = 0;
-
-let popup_w;
-let popupWidth_Min = 100;
-let popupWidth_Max = 300;
-let popupHeight_Min = 100;
-let popupHeight_Max = 300;
-let leftPos;
-let topPos;
-
-let paragraphIndex = 0;
-
-function popup(imgs, imgCounter) {
-        let popupWidth =
-            Math.floor(Math.random() * (popupWidth_Max - popupWidth_Min + 1)) +
-            popupWidth_Min;
-        let popupHeight =
-            Math.floor(
-                Math.random() * (popupHeight_Max - popupHeight_Min + 1)
-            ) + popupHeight_Min;
-        const screenWidth = window.screen.availWidth;
-        const screenHeight = window.screen.availHeight;
-        var leftPos = Math.floor(Math.random() * (screenWidth - popupWidth));
-        var topPos = Math.floor(Math.random() * (screenHeight - popupHeight));
-
-        var popupName = "Popup" + counter;
-
-        popup_w = window.open(
-            "",
-            popupName,
-            `width=${popupWidth},height=${popupHeight}, left=${leftPos}, top=${topPos}`
-        );
-
-        popup_w.document.write(
-            `<html><head><link rel="stylesheet" href="popup.css" /><title>${texts[counter]}</title></head><body>
-            <div class="popup">
-                <img src="${imgs[imgCounter]}">
-            </div>
-            <script src="popup.js"></script>
-            </body></html>`
-        );
-
-        counter++;
-        textCounter++;
-
-        //??Why does this stay at 1??
-        imgCounter++;
-        console.log(imgCounter);
-
-
-        if (imgCounter > imgs.length - 1) {
-            imgCounter = 0;
-        }
-
-        if (textCounter > texts.length - 1) {
-            textCounter = 0;
-        }
-    
-}
-
 
 //every year
-setInterval(() => popup(babyImgs, babyImgsCounter), 31556926000);
-setInterval(() => popup(june4Imgs, june4ImgsCounter), 31556926000);
-
-setInterval(() => popup(fireworksImgs, fireworksImgsCounter), 86400000);
-setInterval(() => popup(migrationImgs, migrationImgsCounter), 31556926000);
-setInterval(() => popup(perennialsImgs, perennialsImgsCounter), 31556926000);
-
-
-// setInterval(() => popup(fireworksImgs, fireworksImgsCounter), 3000);
-// setInterval(() => popup(migrationImgs, migrationImgsCounter), 4000);
+// setInterval(() => popup(fireworksImgs, fireworksImgsCounter), 31556926000);
 
 
 // Function to generate a random letter from the alphabet
@@ -177,9 +55,6 @@ function changeRandomLetter() {
 
 // Initial call to remove a random letter when the page loads
 // setTimeout(function() {changeRandomLetter(); }, 2000);
-// setTimeout(insertMoth(), 2000);
-// setTimeout(insertMoth(), 5000);
-// setInterval(() => insertMoth(), 1000);
 
 
 function insertTexts() {
@@ -201,41 +76,6 @@ function insertTexts() {
 }
 
 insertTexts();
-
-function insertMoth() {
-    textDiv.innerHTML="";
-    for (var i = 0; i < texts.length; i++) {
-        console.log("loop")
-        const paragraph = document.createElement('p');
-        textDiv.appendChild(paragraph);
-        const paragraphText = texts[i];
-        // Split text into an array of characters
-        const characters = paragraphText.split('');
-
-        for (var m = 0; m < characters.length; m++) {
-            // Decide whether to insert an image (50% chance in this example)
-            // var insertImage = Math.random() < 0.01;
-        
-            // if (insertImage) {
-            //   // Randomly select an image URL
-            //   var randomImageUrl = mothImgs[Math.floor(Math.random() * mothImgs.length)];
-        
-            //   // Create an <img> element and set its source
-            //   var imgElement = document.createElement('img');
-            //   imgElement.classList.add("moth");
-            //   imgElement.src = randomImageUrl;
-        
-            //   // Append the image to the content div
-            //   paragraph.appendChild(imgElement);
-            // }
-        
-            // Append the character to the content div
-            paragraph.appendChild(document.createTextNode(characters[m]));
-        }
-        
-    }
-
-}
 
 let lastMove = null;
 

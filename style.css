@@ -71,6 +71,19 @@ img {
     width:100%;
 }
 
+h1 {
+    font-size:6em;
+
+}
+    
+
+h1:hover {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-position: 50% 50%;
+    background-image: url(imgs/erasures/kent.png);
+}
+
 @keyframes appear {
     0% {
         transform:scale(25%);
