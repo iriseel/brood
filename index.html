@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brood</title>
     <link rel="stylesheet" href="style.css">
+
 </head>
 <body>
     <!-- <video autoplay muted loop>
@@ -14,22 +15,30 @@
     <video autoplay muted loop>
         <source src="vids/flag_ceremony_China.mp4">
     </video> -->
-
     <div class="container">
-        <h1>
-            EMERGENCE
-        </h1>
-        <div class="text">
-           
+        <div class="chapter1">
+            <div class="header">
+                emergence
+            </div>
+            <div class="textContainer">
+               
+            </div>
+
         </div>
-    
-        <!-- <div class="moth">
-            <img src="imgs/scan_moths/img20231107_18184108.png">
-            <img src="imgs/scan_moths/img20231107_17580860_1.png">
-            <img src="imgs/scan_moths/img20231107_17580860_2.png">
-        </div> -->
+        <div class="shadowTextContainer">
+
+        </div>
+
     </div>
+    <div class="allMothsContainer"></div>
     
+    <svg>
+        <filter id="turbulence" x="0" y="0" width="100%" height="100%">
+            <feTurbulence id="sea-filter" numOctaves="2" seed="2" baseFrequency="0.02 0.05"></feTurbulence>
+            <feDisplacementMap scale="20" in="SourceGraphic"></feDisplacementMap>
+            <animate xlink:href="#sea-filter" attributeName="baseFrequency" dur="60s" keyTimes="0;0.5;1" values="0.02 0.06;0.04 0.08;0.02 0.06" repeatCounter="indefinite"></animate>
+        </filter>
+    </svg>
 
     <script src="script.js"></script>
 </body>
