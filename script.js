@@ -3,7 +3,6 @@ let flutterIntervals = [];
 let lineIndex = 0;
 const container = document.querySelector(".container");
 const chapter1 = document.querySelector(".chapter1");
-// const textContainer = document.querySelector(".textContainer");
 const shadowTextContainer = document.querySelector(".shadowTextContainer");
 const allMothsContainer = document.querySelector(".allMothsContainer");
 let stickyDivs = [];
@@ -22,9 +21,6 @@ const mothHoleImgs = [
     "imgs/holes/hole2.png",
 ];
 
-const chapter1Header = [
-    "emergence"
-]
 
 const chapter1Texts = [
     "One theory was that the disease started when the moths ate through the archives. Perhaps they were attracted by their disuse, all that history unnourished by life. There was no need for book burning when you could just let them mold. From the moths, the history passed to the bees, the cicadas, the butterflies, the roaches, the locusts, and the maggots. No one noticed a difference in their behaviors.",
@@ -229,96 +225,14 @@ function findHighestDataIndex() {
     return highestDataIndex;
 }
 
-
-//INSERT HEADER TEXTS
-// function insertHeader(chapter, textContainer, texts, textType) {
-//     for (var i = 0; i < texts.length; i++) {
-//         const textDiv = document.createElement(textType);
-//         const parentElement = chapter.querySelector(textContainer);
-//         parentElement.appendChild(textDiv);
-//         const text = texts[i];
-//         insertHeaderWithLineBreaks(text, textDiv);
-//     }
-// }
-
-//SPLIT TEXT INTO LINES (BY CHARACTER) BY WINDOW WIDTH
-// function insertHeaderWithLineBreaks(text, parentElement) {
-//     const words = text.split('');
-
-//     let currentLine = '';
-//     let parentElementWidth = "";
-//     if (parentElement) {
-//         parentElementWidth = parentElement.offsetWidth;
-//     }
-//     else {
-//         console.log("no parent element exists")
-//         return
-//     }
-//     // console.log("parent element width is" + parentElementWidth);
-
-//     // Function to create a new Line div and append it to the parent
-//     function createNewLineDiv(lineText) {
-//         const lineDiv = document.createElement('div');
-//         lineDiv.classList.add("sticky");
-//         //?? these two might not be necessary
-//         lineDiv.classList.add(`line${lineIndex}`);
-//         lineDiv.setAttribute('data-index', lineIndex);
-//         lineDiv.textContent = lineText;
-//         parentElement.appendChild(lineDiv);
-//     }
-
-//     for (var i = 0; i < words.length; i++) {
-//         const word = words[i];
-//         const testLine = currentLine + word + ' ';
-//         // console.log("test line is: " + testLine);
-        
-//         // Create a temporary span element to measure the width of the text
-//         const tempSpan = document.createElement('span');
-//         tempSpan.classList.add("temp");
-//         tempSpan.textContent = testLine;
-//         document.body.appendChild(tempSpan);
-//         //WIP
-//         // offsetWidth doesn't take into account the final space within the span, so width calculations can be off by like 20px
-//         const tempSpanWidth = tempSpan.offsetWidth;
-
-//         // console.log("temp span width is: " + tempSpanWidth);
-
-//         // Check if the width exceeds the window width
-//         if (tempSpanWidth > parentElementWidth) {
-//             // If it does, create a new line with the current line content
-//             //Note that .lineIndex starts at 1, not 0, because i've incremented it before I add the class in createLineDiv
-//             lineIndex++;
-//             createNewLineDiv(currentLine);
-//             // console.log("NEW LINE");
-
-//             // Start a new line with the current word
-//             currentLine = word + ' ';
-//         } else {
-//             // If it doesn't exceed the window width, continue building the current line
-//             currentLine = testLine;
-//         }
-
-//         // Remove the temporary span element
-//         document.body.removeChild(tempSpan);
-//     }
-
-//     // Create a div for the last line if there is any remaining text
-//     if (currentLine.trim() !== '') {
-//         createNewLineDiv(currentLine.trim());
-//     }
-
-//     // define stickyDivs only once they have all been generated!
-//     stickyDivs = document.querySelectorAll('.sticky');
-// }
-
-//INSERT PARAGRAPH TEXTS
-function insertTexts(chapter, textContainer, texts, textType) {
+//INSERT TEXTS
+function insertTexts(chapter, texts) {
     for (var i = 0; i < texts.length; i++) {
-        const textDiv = document.createElement(textType);
-        const parentElement = chapter.querySelector(textContainer);
-        parentElement.appendChild(textDiv);
-        const text = texts[i];
-        insertTextWithLineBreaks(text, textDiv);
+        const paragraphDiv = document.createElement('p');
+        const parentElement = chapter.querySelector(".textContainer");
+        parentElement.appendChild(paragraphDiv);
+        const paragraphText = texts[i];
+        insertTextWithLineBreaks(paragraphText, paragraphDiv);
 
         //add bookworm hole at end of each paragraph
         const img = document.createElement('img');
@@ -332,7 +246,7 @@ function insertTexts(chapter, textContainer, texts, textType) {
     }
 }
 
-//SPLIT TEXT INTO LINES (BY WORD) BY WINDOW WIDTH
+//SPLIT TEXT INTO LINES BY WINDOW WIDTH
 function insertTextWithLineBreaks(text, parentElement) {
     const words = text.split(' ');
 
@@ -349,11 +263,10 @@ function insertTextWithLineBreaks(text, parentElement) {
 
     // Function to create a new Line div and append it to the parent
     function createNewLineDiv(lineText) {
-        console.log(lineText);
         const lineDiv = document.createElement('div');
         lineDiv.classList.add("sticky");
-        //?? these two might not be necessary
         lineDiv.classList.add(`line${lineIndex}`);
+        //?? this might not be necessary
         lineDiv.setAttribute('data-index', lineIndex);
         lineDiv.textContent = lineText;
         parentElement.appendChild(lineDiv);
@@ -391,7 +304,7 @@ function insertTextWithLineBreaks(text, parentElement) {
         }
 
         // Remove the temporary span element
-        // document.body.removeChild(tempSpan);
+        document.body.removeChild(tempSpan);
     }
 
     // Create a div for the last line if there is any remaining text
@@ -419,6 +332,9 @@ function checkScroll() {
         stickyDiv.classList.toggle("blur", isAtTop);
         stickyDiv.classList.toggle("transparent", isAtTop);
 
+        //this is so that multiple duplicate shadow lines aren't added for the same stickyDiv
+        stickyDiv.classList.toggle("latest", isAtTop);
+
         if (isAtTop) {
             // the problem is, isAtTop will be true for all of the previously passed divs bc of their sticky position. So the additional !isLatest condition helps ensure that scrollingDown() is only run once, since as soon as a stickyDiv is unfixed from the top, it gains a .latest class and therefore no longer meets the required conditions
             if (currentScrollTop > lastScrollTop && !isLatest) {
@@ -442,6 +358,7 @@ function checkScroll() {
 
     lastScrollTop = currentScrollTop;
 }
+
 
 function scrollingDown(stickyDiv) {
     // makeBGMoth();
@@ -474,7 +391,6 @@ function scrollingUp() {
 
 
 
-
 //WIP: CLEAN UP SOMEHOW
 // FLUTTER ANIMATIONS
 function bgFlutter(movingDiv) {
@@ -496,8 +412,7 @@ function flutter(mothContainer, x, y, variation) {
 
 
 function init() {
-    // insertHeader(chapter1, ".header", chapter1Header, "p");
-    insertTexts(chapter1, ".textContainer", chapter1Texts, "p");
+    insertTexts(chapter1, chapter1Texts);
     createMovingDivs();
     // updateSticky();
 
