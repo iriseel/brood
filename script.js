@@ -3,7 +3,7 @@ let flutterIntervals = [];
 let lineIndex = 0;
 const container = document.querySelector(".container");
 const chapter1 = document.querySelector(".chapter1");
-const textContainer = document.querySelector(".textContainer");
+// const textContainer = document.querySelector(".textContainer");
 const shadowTextContainer = document.querySelector(".shadowTextContainer");
 const allMothsContainer = document.querySelector(".allMothsContainer");
 let stickyDivs = [];
@@ -22,16 +22,19 @@ const mothHoleImgs = [
     "imgs/holes/hole2.png",
 ];
 
+const chapter1Header = [
+    "emergence"
+]
 
 const chapter1Texts = [
     "One theory was that the disease started when the moths ate through the archives. Perhaps they were attracted by their disuse, all that history unnourished by life. There was no need for book burning when you could just let them mold. From the moths, the history passed to the bees, the cicadas, the butterflies, the roaches, the locusts, and the maggots. No one noticed a difference in their behaviors.",
     "Another theory was that they simply absorbed the memories from all the surfaces of the world, the trash on the streets, the witness trees and building facades and shoddily repaired pavements, the albums and trinkets traded at flea markets.",
-    // "Either way, it was not long before humans became carriers.",
-    // "Dejavu is the first sign. The sights, sounds, smells come from elsewhere. First in passing, then in pursuit. Faces as old as new, intimate conversations with strangers, unfamiliar objects fitting snugly in the hand.",
-    // "It was the cicadas, the ones that come every 17 years. My grandmother remembers seeing them everywhere, on the trees, the buildings, the ground. One couldn’t walk without catching a fistful of vibrating wings. It was like rain. Some people wielded umbrellas as shields.",
-    // "She was blindsided by her first exposure. It was a hot day in August. She had to go out to buy some groceries. She was standing at the crosswalk, waiting for the light to turn. All around her was sound. She felt that all the vibration generated a heat that made the already sweltering weather even more unbearable. The buzzing began to sound like language when suddenly she found herself in a mass of heaving bodies, chanting words in a language she did not understand. The man on stage wore a strange, tall cone of a hat with scribblesd on it, his head hung low, but familiar in a way that terrified her.",
-    // "She later learned that one of her mother’s memories had found her. It turns out that it is quite common for the insects to mistake the relatives of the memories’ former inhabitants for the inhabitants themselves. It is still a mystery how they find their ways to us. Some scientists have proposed that they are attracted to our blood like sugar water. Others have found that these new species of moths are attracted to darkness, and find refuge in the murky crevices within our bodies. Maybe no darkness is the same, but it is inherited.",
-    // "It was not long before serious cases appeared. During dinner, an elderly woman was sabotaged with visions of relatives’ emaciated limbs and swollen bellies, and lost her sight. In the middle of a meeting, a middle-aged man pleaded with his employer to lower his gun and spare his life, swearing that he was not a Communist like his brother.",
+    "Either way, it was not long before humans became carriers.",
+    "Dejavu is the first sign. The sights, sounds, smells come from elsewhere. First in passing, then in pursuit. Faces as old as new, intimate conversations with strangers, unfamiliar objects fitting snugly in the hand.",
+    "It was the cicadas, the ones that come every 17 years. My grandmother remembers seeing them everywhere, on the trees, the buildings, the ground. One couldn’t walk without catching a fistful of vibrating wings. It was like rain. Some people wielded umbrellas as shields.",
+    "She was blindsided by her first exposure. It was a hot day in August. She had to go out to buy some groceries. She was standing at the crosswalk, waiting for the light to turn. All around her was sound. She felt that all the vibration generated a heat that made the already sweltering weather even more unbearable. The buzzing began to sound like language when suddenly she found herself in a mass of heaving bodies, chanting words in a language she did not understand. The man on stage wore a strange, tall cone of a hat with scribblesd on it, his head hung low, but familiar in a way that terrified her.",
+    "She later learned that one of her mother’s memories had found her. It turns out that it is quite common for the insects to mistake the relatives of the memories’ former inhabitants for the inhabitants themselves. It is still a mystery how they find their ways to us. Some scientists have proposed that they are attracted to our blood like sugar water. Others have found that these new species of moths are attracted to darkness, and find refuge in the murky crevices within our bodies. Maybe no darkness is the same, but it is inherited.",
+    "It was not long before serious cases appeared. During dinner, an elderly woman was sabotaged with visions of relatives’ emaciated limbs and swollen bellies, and lost her sight. In the middle of a meeting, a middle-aged man pleaded with his employer to lower his gun and spare his life, swearing that he was not a Communist like his brother.",
     // "",
     
 ];
@@ -226,14 +229,96 @@ function findHighestDataIndex() {
     return highestDataIndex;
 }
 
-//INSERT TEXTS
-function insertTexts(chapter, texts) {
+
+//INSERT HEADER TEXTS
+// function insertHeader(chapter, textContainer, texts, textType) {
+//     for (var i = 0; i < texts.length; i++) {
+//         const textDiv = document.createElement(textType);
+//         const parentElement = chapter.querySelector(textContainer);
+//         parentElement.appendChild(textDiv);
+//         const text = texts[i];
+//         insertHeaderWithLineBreaks(text, textDiv);
+//     }
+// }
+
+//SPLIT TEXT INTO LINES (BY CHARACTER) BY WINDOW WIDTH
+// function insertHeaderWithLineBreaks(text, parentElement) {
+//     const words = text.split('');
+
+//     let currentLine = '';
+//     let parentElementWidth = "";
+//     if (parentElement) {
+//         parentElementWidth = parentElement.offsetWidth;
+//     }
+//     else {
+//         console.log("no parent element exists")
+//         return
+//     }
+//     // console.log("parent element width is" + parentElementWidth);
+
+//     // Function to create a new Line div and append it to the parent
+//     function createNewLineDiv(lineText) {
+//         const lineDiv = document.createElement('div');
+//         lineDiv.classList.add("sticky");
+//         //?? these two might not be necessary
+//         lineDiv.classList.add(`line${lineIndex}`);
+//         lineDiv.setAttribute('data-index', lineIndex);
+//         lineDiv.textContent = lineText;
+//         parentElement.appendChild(lineDiv);
+//     }
+
+//     for (var i = 0; i < words.length; i++) {
+//         const word = words[i];
+//         const testLine = currentLine + word + ' ';
+//         // console.log("test line is: " + testLine);
+        
+//         // Create a temporary span element to measure the width of the text
+//         const tempSpan = document.createElement('span');
+//         tempSpan.classList.add("temp");
+//         tempSpan.textContent = testLine;
+//         document.body.appendChild(tempSpan);
+//         //WIP
+//         // offsetWidth doesn't take into account the final space within the span, so width calculations can be off by like 20px
+//         const tempSpanWidth = tempSpan.offsetWidth;
+
+//         // console.log("temp span width is: " + tempSpanWidth);
+
+//         // Check if the width exceeds the window width
+//         if (tempSpanWidth > parentElementWidth) {
+//             // If it does, create a new line with the current line content
+//             //Note that .lineIndex starts at 1, not 0, because i've incremented it before I add the class in createLineDiv
+//             lineIndex++;
+//             createNewLineDiv(currentLine);
+//             // console.log("NEW LINE");
+
+//             // Start a new line with the current word
+//             currentLine = word + ' ';
+//         } else {
+//             // If it doesn't exceed the window width, continue building the current line
+//             currentLine = testLine;
+//         }
+
+//         // Remove the temporary span element
+//         document.body.removeChild(tempSpan);
+//     }
+
+//     // Create a div for the last line if there is any remaining text
+//     if (currentLine.trim() !== '') {
+//         createNewLineDiv(currentLine.trim());
+//     }
+
+//     // define stickyDivs only once they have all been generated!
+//     stickyDivs = document.querySelectorAll('.sticky');
+// }
+
+//INSERT PARAGRAPH TEXTS
+function insertTexts(chapter, textContainer, texts, textType) {
     for (var i = 0; i < texts.length; i++) {
-        const paragraphDiv = document.createElement('p');
-        const parentElement = chapter.querySelector(".textContainer");
-        parentElement.appendChild(paragraphDiv);
-        const paragraphText = texts[i];
-        insertTextWithLineBreaks(paragraphText, paragraphDiv);
+        const textDiv = document.createElement(textType);
+        const parentElement = chapter.querySelector(textContainer);
+        parentElement.appendChild(textDiv);
+        const text = texts[i];
+        insertTextWithLineBreaks(text, textDiv);
 
         //add bookworm hole at end of each paragraph
         const img = document.createElement('img');
@@ -247,7 +332,7 @@ function insertTexts(chapter, texts) {
     }
 }
 
-//SPLIT TEXT INTO LINES BY WINDOW WIDTH
+//SPLIT TEXT INTO LINES (BY WORD) BY WINDOW WIDTH
 function insertTextWithLineBreaks(text, parentElement) {
     const words = text.split(' ');
 
@@ -264,12 +349,12 @@ function insertTextWithLineBreaks(text, parentElement) {
 
     // Function to create a new Line div and append it to the parent
     function createNewLineDiv(lineText) {
+        console.log(lineText);
         const lineDiv = document.createElement('div');
         lineDiv.classList.add("sticky");
+        //?? these two might not be necessary
         lineDiv.classList.add(`line${lineIndex}`);
         lineDiv.setAttribute('data-index', lineIndex);
-        lineDiv.setAttribute('deleted-once', false);
-        lineDiv.setAttribute('restored-once', false);
         lineDiv.textContent = lineText;
         parentElement.appendChild(lineDiv);
     }
@@ -293,6 +378,7 @@ function insertTextWithLineBreaks(text, parentElement) {
         // Check if the width exceeds the window width
         if (tempSpanWidth > parentElementWidth) {
             // If it does, create a new line with the current line content
+            //Note that .lineIndex starts at 1, not 0, because i've incremented it before I add the class in createLineDiv
             lineIndex++;
             createNewLineDiv(currentLine);
             // console.log("NEW LINE");
@@ -305,7 +391,7 @@ function insertTextWithLineBreaks(text, parentElement) {
         }
 
         // Remove the temporary span element
-        document.body.removeChild(tempSpan);
+        // document.body.removeChild(tempSpan);
     }
 
     // Create a div for the last line if there is any remaining text
@@ -327,46 +413,43 @@ function checkScroll() {
         
         const rect = stickyDiv.getBoundingClientRect();
         const isAtTop = rect.top == 0;
+        const isBelowTop = rect.top > 0;
 
         // Toggle classes based on the position of the sticky div
         stickyDiv.classList.toggle("blur", isAtTop);
         stickyDiv.classList.toggle("transparent", isAtTop);
 
-        //this is so that multiple duplicate shadow lines aren't added for the same stickyDiv
-        stickyDiv.classList.toggle("latest", isAtTop);
-
-        // the problem is, isAtTop will be true for all of the previously passed divs bc of their sticky position
         if (isAtTop) {
-            const currentDataIndex = stickyDiv.getAttribute('data-index');
-            const deletedOnce = stickyDiv.getAttribute('deleted-once') === 'true';
-            const restoredOnce = stickyDiv.getAttribute('restored-once') === 'true';
-            // console.log(deletedOnce);
-            const highestDataIndex = findHighestDataIndex();
-            if (currentScrollTop > lastScrollTop && !isLatest && !restoredOnce) {
-                stickyDiv.setAttribute('restored-once', true);
+            // the problem is, isAtTop will be true for all of the previously passed divs bc of their sticky position. So the additional !isLatest condition helps ensure that scrollingDown() is only run once, since as soon as a stickyDiv is unfixed from the top, it gains a .latest class and therefore no longer meets the required conditions
+            if (currentScrollTop > lastScrollTop && !isLatest) {
                 // console.log("scrolling down");
                 scrollingDown(stickyDiv);
             }
-            // ??this seems to be running multiple times even though isLatest has been toggled off?
-            else if (currentScrollTop < lastScrollTop && isLatest && currentDataIndex == highestDataIndex && !deletedOnce) {
-                stickyDiv.setAttribute('deleted-once', true);
-                console.log("scrolling up");
-                scrollingUp(highestDataIndex);
+        }
+        // Same logic as above: these conditions help ensure that scrollingUp() only runs one time, as soon as a stickyDiv is unfixed from the top. Then the stickyDiv loses its .latest and therefore won't scrollingUp() a second time.
+        else if (isBelowTop) {
+            if (currentScrollTop < lastScrollTop && isLatest) {
+                // console.log("scrolling up");
+                scrollingUp();
             }
-        };
+        }
+
+        //this is so that multiple duplicate shadow lines aren't added for the same stickyDiv
+        //?? I'm putting this after the isAtTop just to make sure that the .latest class isn't removed from the stickyDiv before scrollingDown has a chance to run once. But I don't know if that actually makes a difference?
+        stickyDiv.classList.toggle("latest", isAtTop);
         
     });
 
     lastScrollTop = currentScrollTop;
 }
 
-
 function scrollingDown(stickyDiv) {
     // makeBGMoth();
 
-    // ??This is not cloning the right Lines (see data-indexes) once it's scrolled back up and scrolling down again
     //ADD SHADOW LINE
+    //??For some reason a random "" is prepended at the start of the shadowTextContainer at the first clonenode??
     const shadowLineDiv = stickyDiv.cloneNode(true);
+
     shadowLineDiv.classList.remove("sticky");
     shadowLineDiv.classList.remove("blur");
     shadowLineDiv.classList.remove("transparent");
@@ -375,28 +458,18 @@ function scrollingDown(stickyDiv) {
 
 }
 
-function scrollingUp(targetDataIndex) {
+function scrollingUp() {
     //REMOVE SHADOW LINE
-    const removedShadow = shadowTextContainer.removeChild(shadowTextContainer.firstChild);
-    console.log("removed " + removedShadow);
-
-    // const shadowLines = document.querySelectorAll(".shadowLine");
-    // let removedShadowLine;
-
-    // shadowLines.forEach((shadowLine) => {
-    //     const dataIndex = parseInt(shadowLine.getAttribute('data-index'), 10);
-    
-    //     if (!isNaN(dataIndex) && dataIndex === targetDataIndex) {
-    //         removedShadowLine = shadowLine;
-    //         // If you only need the first occurrence, you can break the loop here
-    //         // break; // Note: The 'break' statement is not allowed outside of loops
-    //     }
-    // });
-    // if (removedShadowLine) {
-    //     removedShadowLine.remove();
-
-    // }
-    // console.log("removed " + removedShadowLine);
+    const removedShadow = shadowTextContainer.firstChild;
+    //??For some reason sometimes more shadows are removed than should be, so that before we get to the top of the text, all the shadows have already been removed. At other times, not as many shadows are removed as should be. Why??
+    if (removedShadow) {
+        shadowTextContainer.removeChild(removedShadow);
+        // console.log("removed: " + removedShadow);
+        console.dir(removedShadow);
+    }
+    else {
+        console.log("shadow to remove doesn't exist!")
+    }
 }
 
 
@@ -423,7 +496,8 @@ function flutter(mothContainer, x, y, variation) {
 
 
 function init() {
-    insertTexts(chapter1, chapter1Texts);
+    // insertHeader(chapter1, ".header", chapter1Header, "p");
+    insertTexts(chapter1, ".textContainer", chapter1Texts, "p");
     createMovingDivs();
     // updateSticky();
 
