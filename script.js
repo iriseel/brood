@@ -3,6 +3,7 @@ let flutterIntervals = [];
 let lineIndex = 0;
 const container = document.querySelector(".container");
 const chapter1 = document.querySelector(".chapter1");
+const chapter2 = document.querySelector(".chapter2");
 const shadowTextContainer = document.querySelector(".shadowTextContainer");
 const allMothsContainer = document.querySelector(".allMothsContainer");
 let stickyDivs = [];
@@ -34,6 +35,10 @@ const chapter1Texts = [
     // "",
     
 ];
+
+const chapter2Texts = [
+    "Then, once the children started to cry and gaze strangely into the distance, it was discovered that the insects were hereditary. Like a woman whose grandmother’s features only surface in her face in adulthood, usually you didn’t find out what you inherited till much later. You could try to predict when a brood would emerge, but it was not always reliable. Sometimes, when the weather was warm, you ate something wrong, or some other obscure conditions were met, they would hatch early.",
+]
 
 
 //every year
@@ -237,8 +242,11 @@ function insertTexts(chapter, texts) {
         //add bookworm hole at end of each paragraph
         const img = document.createElement('img');
         img.classList.add("hole");
-        const holeSize = randomize(30, 60);
+        img.classList.add("sticky");
+        const holeSize = randomize(10, 60);
+        const holeMargin = randomize(0, 40);
         img.style.width = holeSize + "vw";
+        img.style.marginLeft = holeMargin + "vw";
         parentElement.appendChild(img);
         const randomImageUrl = mothHoleImgs[Math.floor(Math.random() * mothHoleImgs.length)];
         img.src = randomImageUrl;
@@ -325,7 +333,8 @@ function checkScroll() {
         const isLatest = getClassName(stickyDiv, 'latest');
         
         const rect = stickyDiv.getBoundingClientRect();
-        const isAtTop = rect.top == 0;
+        // make sure to keep it as <= and not just ==, since sometimes a sticked div seems to go further up than top = 0, and then it will appear if isAtTop = rect.top == 0
+        const isAtTop = rect.top <= 0;
         const isBelowTop = rect.top > 0;
 
         // Toggle classes based on the position of the sticky div
@@ -367,10 +376,17 @@ function scrollingDown(stickyDiv) {
     //??For some reason a random "" is prepended at the start of the shadowTextContainer at the first clonenode??
     const shadowLineDiv = stickyDiv.cloneNode(true);
 
+    // don't add the expand animation for images, bc they look weird
+    const isHeader = getClassName(shadowLineDiv, "header");
+    const isHole = getClassName(shadowLineDiv, "hole");
+
     shadowLineDiv.classList.remove("sticky");
     shadowLineDiv.classList.remove("blur");
     shadowLineDiv.classList.remove("transparent");
     shadowLineDiv.classList.add("shadowLine");
+    if (!isHeader && !isHole) {
+        shadowLineDiv.classList.add("expand");
+    }
     shadowTextContainer.prepend(shadowLineDiv);
 
 }
@@ -380,8 +396,13 @@ function scrollingUp() {
     const removedShadow = shadowTextContainer.firstChild;
     //??For some reason sometimes more shadows are removed than should be, so that before we get to the top of the text, all the shadows have already been removed. At other times, not as many shadows are removed as should be. Why??
     if (removedShadow) {
+        removedShadow.classList.add("transparent");
+        removedShadow.classList.add("shrink");
         shadowTextContainer.removeChild(removedShadow);
-        // console.log("removed: " + removedShadow);
+        // ??I wanted to add this so that there could be a transition, but it seems like waiting 1s to removeChild() is making it so that a lot of shadowLines that should be remvoed are skipped over instead
+        // setTimeout(() => {
+        //     shadowTextContainer.removeChild(removedShadow);
+        // }, 1000);
         console.dir(removedShadow);
     }
     else {
@@ -413,6 +434,7 @@ function flutter(mothContainer, x, y, variation) {
 
 function init() {
     insertTexts(chapter1, chapter1Texts);
+    insertTexts(chapter2, chapter2Texts);
     createMovingDivs();
     // updateSticky();
 
