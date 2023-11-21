@@ -11,6 +11,8 @@ let stickyDivs = [];
 let lastTouchMove = null;
 let lastScrollTop = 0;
 
+let totalHeight = null;
+
 //shadowIndex is for keeping track of which stickyDiv/shadow is the most recently generated
 let shadowIndex = 0;
 let fakestickyScrollDifference = 0;
@@ -76,7 +78,7 @@ document.addEventListener('touchend', function(event) {
 //CREATE N NUMBER OF MOTHS AT WINDOW EDGES (used in init)
 // Function to create divs at random positions
 function createMovingDivs() {
-    const numDivs = 10; // Number of divs to create
+    const numDivs = 3; // Number of divs to create
     
     for (let i = 0; i < numDivs; i++) {
         const [edgeX, edgeY] = getEdgePositions();
@@ -203,8 +205,8 @@ function makeMoth(mothType, x, y) {
     const randomImageUrl = mothImgs[Math.floor(Math.random() * mothImgs.length)];
     imgElement.src = randomImageUrl;
 
-    const mothSize = randomize(10, 60);
-    imgElement.style.width = mothSize + "vw";
+    const mothSize = randomize(20, 50);
+    imgElement.style.height = mothSize + "vh";
 
     allMothsContainer.appendChild(mothContainer);
     mothContainer.appendChild(moth);
@@ -243,30 +245,50 @@ function insertTexts(chapter, texts) {
         const paragraphText = texts[i];
         insertTextWithLineBreaks(paragraphText, paragraphDiv);
 
-        // const spaceDiv = document.createElement("div");
-        // spaceDiv.classList.add("space");
-        // spaceDiv.classList.add("sticky");
-        // parentElement.appendChild(spaceDiv);
-
         //add bookworm hole at end of each paragraph
-        const img = document.createElement('img');
-        img.classList.add("hole");
-        img.classList.add("fakesticky");
-        const holeSize = randomize(10, 60);
-        const holeMargin = randomize(0, 40);
-        img.style.width = holeSize + "vw";
-        img.style.marginLeft = holeMargin + "vw";
-        parentElement.appendChild(img);
-        const randomImageUrl = mothHoleImgs[Math.floor(Math.random() * mothHoleImgs.length)];
-        img.src = randomImageUrl;
+        //hole mask
+        const imgDiv = document.createElement('div');
+        imgDiv.classList.add("hole");
+        imgDiv.classList.add("fakesticky");
+        const holeWidth = randomize(10, 90);
+        const holeHeight = holeWidth/2;
+        const holeMargin = randomize(0, 100 - holeWidth);
+        imgDiv.style.width = holeWidth + "vw";
+        imgDiv.style.height = holeHeight + "vw";
+        //the -1em is to account for the body's 1em margin
+        imgDiv.style.marginLeft = `calc(${holeMargin}vw - 1em)`;
+        parentElement.appendChild(imgDiv);
+
+        //hole moth
+        //?? Adding holemoths seems to mess up the scrolling a little, introduces wiggle room for scrolling back up, and extra down (so that the scanner line is scrolled past), which shouldn't be allowed at all. This problem only happens on touchscreen, not when it's desktop!
+        // ??Adding this iteration seems to break the page?
+        // const numHoleMoths = randomize(1, 2);
+        // for (var i = 0; i < numHoleMoths; i++) {
+            const img = document.createElement('img');
+            img.classList.add("holeMoth");
+            const randomImageUrl = mothImgs[Math.floor(Math.random() * mothImgs.length)];
+            img.src = randomImageUrl;
+
+            //?? WIP not sure this helps make the animation more organic/erratic
+            // Use cubic-bezier timing function for the animation
+            const timingFunction = `cubic-bezier(${Math.random()}, ${Math.random()}, ${Math.random()}, ${Math.random()})`;
+            const duration = randomize(.5, 2); // Adjust the duration as needed
+            // Apply the animation
+            img.style.transition = `left ${duration}s ${timingFunction}, top ${duration}s ${timingFunction}`;
+
+            const mothHeight = randomize(20, 90);
+            img.style.height = mothHeight + "vh";
+            imgDiv.appendChild(img);
+            setInterval(() => flutter(img, imgDiv.offsetWidth/2, imgDiv.offsetHeight/2, 200), duration*1000);
+        // }
+        
 
         lineIndex++;
-        img.classList.add(`line${lineIndex}`);
-        img.setAttribute('data-index', lineIndex);
-
-        // allMothsContainer.appendChild(spaceDiv);
+        imgDiv.classList.add(`line${lineIndex}`);
+        imgDiv.setAttribute('data-index', lineIndex);
         
     }
+    
 }
 
 //SPLIT TEXT INTO LINES BY WINDOW WIDTH
@@ -341,25 +363,29 @@ function insertTextWithLineBreaks(text, parentElement) {
 }
 
 //SCROLLING FUNCTIONS
-function checkScroll() {
+function checkScroll(event) {
     const currentScrollTop = window.scrollY || document.documentElement.scrollTop;
     const scrollDifference = currentScrollTop - lastScrollTop;
     // console.log(shadowIndex);
+
+    // disabling scrolling up so the user can only move forward
+    if (currentScrollTop < lastScrollTop) {
+        // event.preventDefault();
+        window.scrollTo(0, lastScrollTop);
+    }
 
     stickyDivs.forEach(function(stickyDiv) {
 
         //check if stickyDiv meets these conditions
         const isLatest = getClassName(stickyDiv, 'latest');
         const isFakesticky = getClassName(stickyDiv, "fakesticky");
+        const isHole = getClassName(stickyDiv, "hole");
         const dataIndexValue = stickyDiv.getAttribute('data-index');
-        // const hasBeenPassed = getClassName(stickyDiv, "past");
         
         const rect = stickyDiv.getBoundingClientRect();
         // make sure to keep it as <= and not just ==, since sometimes a sticked div seems to go further up than top = 0, and then it will appear if isAtOrAboveTop = rect.top == 0
         const isAtOrAboveTop = rect.top <= 0;
         const isBelowTop = rect.top > 0;
-
-        const bottomIsBelowTop = rect.bottom >= 0;
 
         // Toggle classes based on the position of the sticky div
         if (!isFakesticky) {
@@ -377,7 +403,7 @@ function checkScroll() {
                 //reset fakestickyScrollDifference for the most recently scrolled past stickyDiv
                 fakestickyScrollDifference = 0;
                 shadowIndex = parseInt(stickyDiv.getAttribute('data-index'), 10);
-                scrollingDown(stickyDiv, isFakesticky);
+                scrollingDown(stickyDiv, isFakesticky, isHole);
             }
 
             //fakestickyScrollingDown() only for the most recently scrolled past stickyDiv (i.e., whose data-index matches shadowIndex)
@@ -387,13 +413,13 @@ function checkScroll() {
             }
         }
         // Same logic as above: these conditions help ensure that scrollingUp() only runs one time, as soon as a stickyDiv is unfixed from the top. Then the stickyDiv loses its .latest and therefore won't scrollingUp() a second time.
-        else if (isBelowTop) {
-            if (currentScrollTop < lastScrollTop && isLatest && !isFakesticky) {
-                fakestickyScrollDifference = 0;
-                shadowIndex = parseInt(stickyDiv.getAttribute('data-index'), 10) -1;
-                scrollingUp();
-            }
-        }
+        // else if (isBelowTop) {
+        //     if (currentScrollTop < lastScrollTop && isLatest && !isFakesticky) {
+        //         fakestickyScrollDifference = 0;
+        //         shadowIndex = parseInt(stickyDiv.getAttribute('data-index'), 10) -1;
+        //         scrollingUp();
+        //     }
+        // }
 
         //this is so that multiple duplicate shadow lines aren't added for the same stickyDiv
         //?? I'm putting this after the isAtOrAboveTop just to make sure that the .latest class isn't removed from the stickyDiv before scrollingDown has a chance to run once. But I don't know if that actually makes a difference?
@@ -405,7 +431,7 @@ function checkScroll() {
 }
 
 
-function scrollingDown(stickyDiv, isFakesticky) {
+function scrollingDown(stickyDiv, isFakesticky, isHole) {
     // makeBGMoth();
 
     //ADD SHADOW LINE
@@ -420,6 +446,12 @@ function scrollingDown(stickyDiv, isFakesticky) {
     shadowLineDiv.classList.add("shadowLine");
     if (!isFakesticky) {
         shadowLineDiv.classList.add("expand");
+    }
+    else if (isHole) {
+        const holeMoths = shadowLineDiv.querySelectorAll("img");
+        holeMoths.forEach((holeMoth) => {
+            setInterval(() => flutter(holeMoth, shadowLineDiv.offsetWidth/2, shadowLineDiv.offsetHeight/2, 200), 1000);
+        })
     }
     shadowTextContainer.prepend(shadowLineDiv);
 
@@ -468,24 +500,6 @@ function fakestickyScrollingDown(stickyDiv, scrollDifference) {
     
 }
 
-function fakestickyScrollingUp(stickyDiv, scrollDifference) {
-    // console.log("fake scrolling up");
-    //find the shadow div that corresponds to the most recently scrolled past stickyDiv
-    const shadow = document.querySelector(`.fakesticky.latest.shadowLine[data-index="${shadowIndex}"]`);
-    // console.log(shadowIndex);
-    // console.log(shadow)
-    fakestickyScrollDifference = fakestickyScrollDifference + scrollDifference;
-
-    shadow.style.top = `${-fakestickyScrollDifference}px`;
-    shadow.style.marginBottom = `${-fakestickyScrollDifference}px`;
-    
-    if (fakestickyScrollDifference >= shadow.offsetHeight) {
-        stickyDiv.classList.remove("past");
-        scrollingUp();
-    }
-    
-}
-
 //WIP: CLEAN UP SOMEHOW
 // FLUTTER ANIMATIONS
 function bgFlutter(movingDiv) {
@@ -506,9 +520,20 @@ function flutter(mothContainer, x, y, variation) {
 }
 
 
+// set the window to start at the top each time I reload the page
+window.onbeforeunload = function() {
+    history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+};
+
 function init() {
     insertTexts(chapter1, chapter1Texts);
     insertTexts(chapter2, chapter2Texts);
+
+    //get container height only once all stickyDivs have been inserted!
+    totalHeight = container.scrollHeight;
+    console.log(totalHeight);
+
     createMovingDivs();
     // updateSticky();
 
@@ -518,3 +543,6 @@ function init() {
 }
 
 init();
+
+
+
