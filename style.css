@@ -4,15 +4,19 @@
     url("fonts/Pirelli_Regular.ttf") format("truetype"),
 }
 
+@font-face {
+    font-family: "Rader";
+    src:
+    url("fonts/PPRader-Thin.otf") format("opentype"),
+}
+
 * {
     box-sizing: border-box;
 }
 
-html {
-}
-
 body {
     font-size:clamp(20px, 30px, 40px);
+    /* font-size:80px; */
     font-family: "Pirelli_Regular";
     background:black;
     color:white;
@@ -23,6 +27,12 @@ body {
 img {
     width:60vw;
     height:auto;
+}
+
+.space {
+    width:100%;
+    height:4em;
+    display:block;
 }
 
 /* top scanner glow */
@@ -77,6 +87,8 @@ img {
     */
 
     margin-bottom:2em;
+
+    /* background:red; */
 }
 
 .header img {
@@ -95,12 +107,20 @@ span.temp {
     border:0;
 }
 
+.sticky, .fakesticky {
+    transition: filter 1s ease-in-out, opacity 1s ease-in-out, transform 1s ease-in-out;
+}
+
 .sticky {
     position: -webkit-sticky;
     position: sticky;
     top: 0px;
+}
 
-    transition: filter 1s ease-in-out, opacity 1s ease-in-out, transform 1s ease-in-out;
+/* for images, headers, and any other tall elements that would produce awkward spacing if prepended outright*/
+.fakesticky {
+    position:relative;
+    /* background:red; */
 }
 
 /* SHADOW STYLING */
@@ -109,7 +129,6 @@ span.temp {
     top:0;
     left:0;
     height:100vh;
-    overflow:hidden;
 
 }
 
@@ -117,6 +136,7 @@ span.temp {
     z-index:-1;
     /* need this padding to replicate the margin on body, which applies to container. but don't need it for vertical, since sticky activates at top:0 */
     padding: 0 1em;
+    overflow-y: visible;
     /* background:blue; */
 }
 
@@ -125,6 +145,13 @@ span.temp {
     opacity:.5;
     filter: blur(3px);
     transition: max-height 1s ease-in-out, opacity 1s ease-in-out;
+    position:relative;
+}
+
+.fakesticky.shadowLine {
+    transform: scaleY(-1);
+    /* need this fadeIn animation to coverup a weird glitch thing it does on prepend */
+    animation: fadeIn 1s ease-in-out forwards;
 }
 
 .expand {
@@ -158,9 +185,20 @@ span.temp {
     }
 }
 
+@keyframes fadeIn {
+    0%{
+        opacity:0;
+    }
+    100%{
+        opacity:.5;
+    }
+}
+
 /* MOTH STYLING */
 .allMothsContainer {
     width:100vw;
+
+    overflow:hidden;
 }
 
 .moth_container, .bg_moth_container {

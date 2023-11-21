@@ -11,6 +11,10 @@ let stickyDivs = [];
 let lastTouchMove = null;
 let lastScrollTop = 0;
 
+//shadowIndex is for keeping track of which stickyDiv/shadow is the most recently generated
+let shadowIndex = 0;
+let fakestickyScrollDifference = 0;
+
 const mothImgs = [
     "imgs/scan_moths/img20231107_18184108.png",
     "imgs/scan_moths/img20231107_17580860_1.png",
@@ -215,7 +219,7 @@ function makeMoth(mothType, x, y) {
 function findHighestDataIndex() {
     // let highestDataIndexStickyDiv;
     let highestDataIndex = -Infinity;
-    const latestStickyDivs = document.querySelectorAll(".sticky.latest");
+    const latestStickyDivs = document.querySelectorAll(".sticky.latest, .fakesticky.latest");
 
     latestStickyDivs.forEach(function(latestStickyDiv) {
         const dataIndexValue = parseInt(latestStickyDiv.getAttribute('data-index'), 10);
@@ -239,10 +243,15 @@ function insertTexts(chapter, texts) {
         const paragraphText = texts[i];
         insertTextWithLineBreaks(paragraphText, paragraphDiv);
 
+        // const spaceDiv = document.createElement("div");
+        // spaceDiv.classList.add("space");
+        // spaceDiv.classList.add("sticky");
+        // parentElement.appendChild(spaceDiv);
+
         //add bookworm hole at end of each paragraph
         const img = document.createElement('img');
         img.classList.add("hole");
-        img.classList.add("sticky");
+        img.classList.add("fakesticky");
         const holeSize = randomize(10, 60);
         const holeMargin = randomize(0, 40);
         img.style.width = holeSize + "vw";
@@ -250,6 +259,12 @@ function insertTexts(chapter, texts) {
         parentElement.appendChild(img);
         const randomImageUrl = mothHoleImgs[Math.floor(Math.random() * mothHoleImgs.length)];
         img.src = randomImageUrl;
+
+        lineIndex++;
+        img.classList.add(`line${lineIndex}`);
+        img.setAttribute('data-index', lineIndex);
+
+        // allMothsContainer.appendChild(spaceDiv);
         
     }
 }
@@ -294,7 +309,7 @@ function insertTextWithLineBreaks(text, parentElement) {
         // offsetWidth doesn't take into account the final space within the span, so width calculations can be off by like 20px
         const tempSpanWidth = tempSpan.offsetWidth;
 
-        console.log("temp span width is: " + tempSpanWidth);
+        // console.log("temp span width is: " + tempSpanWidth);
 
         // Check if the width exceeds the window width
         if (tempSpanWidth > parentElementWidth) {
@@ -317,51 +332,72 @@ function insertTextWithLineBreaks(text, parentElement) {
 
     // Create a div for the last line if there is any remaining text
     if (currentLine.trim() !== '') {
+        lineIndex++;
         createNewLineDiv(currentLine.trim());
     }
 
     // define stickyDivs only once they have all been generated!
-    stickyDivs = document.querySelectorAll('.sticky');
+    stickyDivs = document.querySelectorAll('.sticky, .fakesticky');
 }
 
 //SCROLLING FUNCTIONS
 function checkScroll() {
     const currentScrollTop = window.scrollY || document.documentElement.scrollTop;
+    const scrollDifference = currentScrollTop - lastScrollTop;
+    // console.log(shadowIndex);
 
     stickyDivs.forEach(function(stickyDiv) {
 
+        //check if stickyDiv meets these conditions
         const isLatest = getClassName(stickyDiv, 'latest');
+        const isFakesticky = getClassName(stickyDiv, "fakesticky");
+        const dataIndexValue = stickyDiv.getAttribute('data-index');
+        // const hasBeenPassed = getClassName(stickyDiv, "past");
         
         const rect = stickyDiv.getBoundingClientRect();
-        // make sure to keep it as <= and not just ==, since sometimes a sticked div seems to go further up than top = 0, and then it will appear if isAtTop = rect.top == 0
-        const isAtTop = rect.top <= 0;
+        // make sure to keep it as <= and not just ==, since sometimes a sticked div seems to go further up than top = 0, and then it will appear if isAtOrAboveTop = rect.top == 0
+        const isAtOrAboveTop = rect.top <= 0;
         const isBelowTop = rect.top > 0;
 
+        const bottomIsBelowTop = rect.bottom >= 0;
+
         // Toggle classes based on the position of the sticky div
-        stickyDiv.classList.toggle("blur", isAtTop);
-        stickyDiv.classList.toggle("transparent", isAtTop);
+        if (!isFakesticky) {
+            stickyDiv.classList.toggle("blur", isAtOrAboveTop);
+            stickyDiv.classList.toggle("transparent", isAtOrAboveTop);
+        }
 
         //this is so that multiple duplicate shadow lines aren't added for the same stickyDiv
-        stickyDiv.classList.toggle("latest", isAtTop);
+        stickyDiv.classList.toggle("latest", isAtOrAboveTop);
 
-        if (isAtTop) {
-            // the problem is, isAtTop will be true for all of the previously passed divs bc of their sticky position. So the additional !isLatest condition helps ensure that scrollingDown() is only run once, since as soon as a stickyDiv is unfixed from the top, it gains a .latest class and therefore no longer meets the required conditions
+        if (isAtOrAboveTop) {
+            // the problem is, isAtOrAboveTop will be true for all of the previously passed divs bc of their sticky position. So the additional !isLatest condition helps ensure that scrollingDown() is only run once, since as soon as a stickyDiv is unfixed from the top, it gains a .latest class and therefore no longer meets the required conditions
             if (currentScrollTop > lastScrollTop && !isLatest) {
                 // console.log("scrolling down");
-                scrollingDown(stickyDiv);
+                //reset fakestickyScrollDifference for the most recently scrolled past stickyDiv
+                fakestickyScrollDifference = 0;
+                shadowIndex = parseInt(stickyDiv.getAttribute('data-index'), 10);
+                scrollingDown(stickyDiv, isFakesticky);
+            }
+
+            //fakestickyScrollingDown() only for the most recently scrolled past stickyDiv (i.e., whose data-index matches shadowIndex)
+            else if (dataIndexValue == shadowIndex && isFakesticky) {
+                    fakestickyScrollingDown(stickyDiv, scrollDifference);
+                
             }
         }
         // Same logic as above: these conditions help ensure that scrollingUp() only runs one time, as soon as a stickyDiv is unfixed from the top. Then the stickyDiv loses its .latest and therefore won't scrollingUp() a second time.
         else if (isBelowTop) {
-            if (currentScrollTop < lastScrollTop && isLatest) {
-                // console.log("scrolling up");
+            if (currentScrollTop < lastScrollTop && isLatest && !isFakesticky) {
+                fakestickyScrollDifference = 0;
+                shadowIndex = parseInt(stickyDiv.getAttribute('data-index'), 10) -1;
                 scrollingUp();
             }
         }
 
         //this is so that multiple duplicate shadow lines aren't added for the same stickyDiv
-        //?? I'm putting this after the isAtTop just to make sure that the .latest class isn't removed from the stickyDiv before scrollingDown has a chance to run once. But I don't know if that actually makes a difference?
-        stickyDiv.classList.toggle("latest", isAtTop);
+        //?? I'm putting this after the isAtOrAboveTop just to make sure that the .latest class isn't removed from the stickyDiv before scrollingDown has a chance to run once. But I don't know if that actually makes a difference?
+        // stickyDiv.classList.toggle("latest", isAtOrAboveTop);
         
     });
 
@@ -369,22 +405,20 @@ function checkScroll() {
 }
 
 
-function scrollingDown(stickyDiv) {
+function scrollingDown(stickyDiv, isFakesticky) {
     // makeBGMoth();
 
     //ADD SHADOW LINE
     //??For some reason a random "" is prepended at the start of the shadowTextContainer at the first clonenode??
     const shadowLineDiv = stickyDiv.cloneNode(true);
 
-    // don't add the expand animation for images, bc they look weird
-    const isHeader = getClassName(shadowLineDiv, "header");
-    const isHole = getClassName(shadowLineDiv, "hole");
-
     shadowLineDiv.classList.remove("sticky");
+    shadowLineDiv.style.position = "relative";
+
     shadowLineDiv.classList.remove("blur");
     shadowLineDiv.classList.remove("transparent");
     shadowLineDiv.classList.add("shadowLine");
-    if (!isHeader && !isHole) {
+    if (!isFakesticky) {
         shadowLineDiv.classList.add("expand");
     }
     shadowTextContainer.prepend(shadowLineDiv);
@@ -403,14 +437,54 @@ function scrollingUp() {
         // setTimeout(() => {
         //     shadowTextContainer.removeChild(removedShadow);
         // }, 1000);
-        console.dir(removedShadow);
+        // console.dir(removedShadow);
     }
     else {
         console.log("shadow to remove doesn't exist!")
     }
 }
 
+//FAKESTICKY SCROLLING
+function fakestickyScrollingDown(stickyDiv, scrollDifference) {
+    // console.log("fake scrolling down");
+    //find the shadow div that corresponds to the most recently scrolled past stickyDiv
+    const shadow = document.querySelector(`.fakesticky.latest.shadowLine[data-index="${shadowIndex}"]`);
+    // console.log(shadow)
+    // console.log(shadowIndex);
+    const computedStyle = window.getComputedStyle(shadow);
+    fakestickyScrollDifference = fakestickyScrollDifference + scrollDifference;
 
+    //shift the shadow up so that the texts before it don't suddenly jump down
+    shadow.style.top = `${-shadow.offsetHeight + fakestickyScrollDifference}px`;
+    shadow.style.marginBottom = `${-shadow.offsetHeight + fakestickyScrollDifference}px`;
+    
+    // this needs to go after shadow.style.top is set for the first time above, otherwise shadow.style.top starts at 0 and this condition is automatically set forever
+    if (parseInt(computedStyle.top) >= 0) {
+        shadow.style.top = 0 + "px";
+        shadow.style.marginBottom = 0 + "px";
+        stickyDiv.classList.add("past");
+    }
+    // console.log(shadow.style.top)
+    
+}
+
+function fakestickyScrollingUp(stickyDiv, scrollDifference) {
+    // console.log("fake scrolling up");
+    //find the shadow div that corresponds to the most recently scrolled past stickyDiv
+    const shadow = document.querySelector(`.fakesticky.latest.shadowLine[data-index="${shadowIndex}"]`);
+    // console.log(shadowIndex);
+    // console.log(shadow)
+    fakestickyScrollDifference = fakestickyScrollDifference + scrollDifference;
+
+    shadow.style.top = `${-fakestickyScrollDifference}px`;
+    shadow.style.marginBottom = `${-fakestickyScrollDifference}px`;
+    
+    if (fakestickyScrollDifference >= shadow.offsetHeight) {
+        stickyDiv.classList.remove("past");
+        scrollingUp();
+    }
+    
+}
 
 //WIP: CLEAN UP SOMEHOW
 // FLUTTER ANIMATIONS
