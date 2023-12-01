@@ -20,9 +20,40 @@ body {
     font-family: "Pirelli_Regular";
     background:black;
     color:white;
+    /* background:white;
+    color:black; */
     margin:1em;
     /* position:relative; */
+
+    display:flex;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-content: center;
+
 }
+
+/* scrollbar */
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: black;
+  }
+   
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    /* background:white; */
+    background: url('imgs/scan_words/scrollbar.png') black;
+    background-size: cover; 
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+  }
 
 img {
     width:60vw;
@@ -48,18 +79,24 @@ img {
 }
 
 /* TEXT STYLING */
+.container, .allMothsContainer, .shadowTextContainer {
+    max-width:500px;
+}
+
 .container {
-    max-width:100vw;
-    /* max-width:500px; */
+    /* max-width:100vw; */
     display:flex;
     flex-flow: row wrap;
     justify-content: center;
     align-content: center;
     /* background:red; */
+    position:relative;
 }
 
 .chapter {
+    width:100%;
     margin-bottom:4em;
+    margin-top:90vh;
 }
 
 .header, .textContainer, .shadowTextContainer {
@@ -68,7 +105,7 @@ img {
 }
 
 .header {
-    height:50vh;
+    /* height:100vh; */
     /* margin:1em 0; */
     display:flex;
     flex-flow: row wrap;
@@ -92,7 +129,9 @@ img {
 }
 
 .header img {
-    max-height:50%;
+    filter:drop-shadow(0 0 0.2em rgba(255,255,255, 1));
+    width:100%;
+    max-height:100%;
     /* background:green; */
 }
 
@@ -126,16 +165,13 @@ span.temp {
 /* SHADOW STYLING */
 .shadowTextContainer, .allMothsContainer {
     position:fixed;
-    top:0;
-    left:0;
     height:100vh;
 
 }
 
+/* ??Why does this shift to the left on touchscreen? */
 .shadowTextContainer {
     z-index:-1;
-    /* need this padding to replicate the margin on body, which applies to container. but don't need it for vertical, since sticky activates at top:0 */
-    padding: 0 1em;
     overflow-y: visible;
     /* background:blue; */
 }
@@ -143,7 +179,7 @@ span.temp {
 .shadowLine {
     /* background:pink; */
     opacity:.5;
-    filter: blur(3px);
+    filter: blur(2.5px);
     transition: max-height 1s ease-in-out, opacity 1s ease-in-out;
     position:relative;
 }
@@ -205,6 +241,7 @@ span.temp {
     box-shadow: inset 0 0 10px 10px rgba(255,255,255,.1);
     /* ?? this seems important somehow as a possible reason behind the scroll wiggle room - when overflow:visible, you can scroll back infinitely */
     overflow:hidden;
+    /* background:red; */
 }
 
 .holeMoth {
@@ -223,11 +260,12 @@ span.temp {
 /* MOTH STYLING */
 .allMothsContainer {
     width:100vw;
-
+    top:0;
+    left:0;
     overflow:hidden;
 }
 
-.moth_container, .bg_moth_container {
+.moth_container {
     /* width:50vw; */
     position:absolute;
     filter: drop-shadow(10px 10px 6px black);
@@ -240,17 +278,14 @@ span.temp {
     /* animation: appear 5s infinite; */
 }
 
-.bg_moth_container {
-    z-index:-10;
-    transition: 1s ease-in-out;
-}
-
 .moth {
-    width:100%;
+    width:80%;
+    height:80%;
 }
 
 .moth img {
-    width:auto;
+    max-width:100%;
+    max-height:100%;
 }
 
 /* GENERAL STYLING */

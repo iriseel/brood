@@ -1,3 +1,5 @@
+let touchDevice = false;
+
 let mothContainers = null;
 let flutterIntervals = [];
 let lineIndex = 0;
@@ -8,25 +10,38 @@ const shadowTextContainer = document.querySelector(".shadowTextContainer");
 const allMothsContainer = document.querySelector(".allMothsContainer");
 let stickyDivs = [];
 
-let lastTouchMove = null;
 let lastScrollTop = 0;
-
-let totalHeight = null;
 
 //shadowIndex is for keeping track of which stickyDiv/shadow is the most recently generated
 let shadowIndex = 0;
 let fakestickyScrollDifference = 0;
 
 const mothImgs = [
-    "imgs/scan_moths/img20231107_18184108.png",
+    "imgs/scan_moths/img20231107_17445165_1.png",
+    "imgs/scan_moths/img20231107_17445165_2.png",
+    "imgs/scan_moths/img20231107_17445165_3.png",
     "imgs/scan_moths/img20231107_17580860_1.png",
-    "imgs/scan_moths/img20231107_17580860_2.png"
+    "imgs/scan_moths/img20231107_17580860_2.png",
+    "imgs/scan_moths/img20231107_18165319.png",
+    "imgs/scan_moths/img20231107_18174427_1.png",
+    "imgs/scan_moths/img20231107_18174427_2.png",
+    "imgs/scan_moths/img20231107_18184108_1.png",
+    "imgs/scan_moths/img20231107_18184108_2.png",
+    "imgs/scan_moths/img20231107_18184108.png",
+    "imgs/scan_moths/img20231107_18223046_1.png",
+    "imgs/scan_moths/img20231107_18223046_2.png",
+    "imgs/scan_moths/img20231107_18231857.png",
+    "imgs/scan_moths/img20231107_18273517.png",
+    // "imgs/scan_moths/",
+    // "imgs/scan_moths/",
+    // "imgs/scan_moths/",
+    // "imgs/scan_moths/"
 ];
 
-const mothHoleImgs = [
-    "imgs/holes/hole1.png",
-    "imgs/holes/hole2.png",
-];
+// const mothHoleImgs = [
+//     "imgs/holes/hole1.png",
+//     "imgs/holes/hole2.png",
+// ];
 
 
 const chapter1Texts = [
@@ -56,24 +71,15 @@ document.addEventListener('touchstart', function(event) {
     console.log(event.touches);
     const x = touch.clientX;
     const y = touch.clientY;
-    lastTouchMove = event;
    
     clearAllFlutterIntervals();
     sendMothstoTarget(x, y);
 })
 
-//?? WIP
-// Override with touchmove, which is triggered only on move
-document.addEventListener('touchmove', function(event) {
-  lastTouchMove = event;
-});
 
 document.addEventListener('touchend', function(event) {
     setTimeout(() => sendMothstoEdges(), 1000);
-    // console.log("touchend")
 })
-
-
 
 //CREATE N NUMBER OF MOTHS AT WINDOW EDGES (used in init)
 // Function to create divs at random positions
@@ -87,30 +93,15 @@ function createMovingDivs() {
     }
 }
 
-//MAKE BG MOTH
-function makeBGMoth() {
-    // console.log("creating bg moth")
-    const bgMothContainers = document.querySelectorAll(".bg_moth_container");
-    if (bgMothContainers.length > 10) {
-        bgMothContainers[0].remove();
-        // console.log("removed moth");
-    }
-
-    const scrollY = window.scrollY;
-
-    const [mothContainer] = makeMoth("bg_moth_container", 0, scrollY);
-
-    mothContainer.classList.add("blur");
-
-    setInterval(() => bgFlutter(mothContainer, scrollY), 500);
-}
-
 //SEND MOTHS TO TARGET
 function sendMothstoTarget(x, y) {
     const variation = 100;
     mothContainers = document.querySelectorAll(".moth_container");
     // Calculate the distance and duration based on div's initial position
     mothContainers.forEach((mothContainer) => {
+        const randomImageUrl = mothImgs[Math.floor(Math.random() * mothImgs.length)];
+        const imgElement = mothContainer.querySelector(".moth").querySelector("img");
+        imgElement.src = randomImageUrl;
         mothContainer.style.transition = ".15s ease-in-out";
         const flutterInterval = setInterval(() => flutter(mothContainer, x, y, variation), 150);
         flutterIntervals.push(flutterInterval);
@@ -205,7 +196,7 @@ function makeMoth(mothType, x, y) {
     const randomImageUrl = mothImgs[Math.floor(Math.random() * mothImgs.length)];
     imgElement.src = randomImageUrl;
 
-    const mothSize = randomize(20, 50);
+    const mothSize = randomize(10, 80);
     imgElement.style.height = mothSize + "vh";
 
     allMothsContainer.appendChild(mothContainer);
@@ -245,47 +236,50 @@ function insertTexts(chapter, texts) {
         const paragraphText = texts[i];
         insertTextWithLineBreaks(paragraphText, paragraphDiv);
 
-        //add bookworm hole at end of each paragraph
-        //hole mask
-        const imgDiv = document.createElement('div');
-        imgDiv.classList.add("hole");
-        imgDiv.classList.add("fakesticky");
-        const holeWidth = randomize(10, 90);
-        const holeHeight = holeWidth/2;
-        const holeMargin = randomize(0, 100 - holeWidth);
-        imgDiv.style.width = holeWidth + "vw";
-        imgDiv.style.height = holeHeight + "vw";
-        //the -1em is to account for the body's 1em margin
-        imgDiv.style.marginLeft = `calc(${holeMargin}vw - 1em)`;
-        parentElement.appendChild(imgDiv);
+        if (!touchDevice) {
+            //add bookworm hole at end of each paragraph
+            //hole mask
+            const imgDiv = document.createElement('div');
+            imgDiv.classList.add("hole");
+            imgDiv.classList.add("fakesticky");
+            const holeWidth = randomize(10, 40);
+            const holeHeight = randomize(10, 30);
+            const holeMargin = randomize(0, 100 - holeWidth);
+            imgDiv.style.width = holeWidth + "%";
+            imgDiv.style.height = holeHeight + "vh";
+            //the -1em is to account for the body's 1em margin
+            imgDiv.style.marginLeft = `calc(${holeMargin}% - 1em)`;
+            parentElement.appendChild(imgDiv);
 
-        //hole moth
-        //?? Adding holemoths seems to mess up the scrolling a little, introduces wiggle room for scrolling back up, and extra down (so that the scanner line is scrolled past), which shouldn't be allowed at all. This problem only happens on touchscreen, not when it's desktop!
-        // ??Adding this iteration seems to break the page?
-        // const numHoleMoths = randomize(1, 2);
-        // for (var i = 0; i < numHoleMoths; i++) {
-            const img = document.createElement('img');
-            img.classList.add("holeMoth");
-            const randomImageUrl = mothImgs[Math.floor(Math.random() * mothImgs.length)];
-            img.src = randomImageUrl;
+            //hole moth
+            //?? Adding holemoths seems to mess up the scrolling a little, introduces wiggle room for scrolling back up, and extra down (so that the scanner line is scrolled past), which shouldn't be allowed at all. This problem only happens on touchscreen, not when it's desktop!
+            // ??Adding this iteration seems to break the page?
+            // const numHoleMoths = randomize(1, 2);
+            // for (var i = 0; i < numHoleMoths; i++) {
+                const img = document.createElement('img');
+                img.classList.add("holeMoth");
+                const randomImageUrl = mothImgs[Math.floor(Math.random() * mothImgs.length)];
+                img.src = randomImageUrl;
 
-            //?? WIP not sure this helps make the animation more organic/erratic
-            // Use cubic-bezier timing function for the animation
-            const timingFunction = `cubic-bezier(${Math.random()}, ${Math.random()}, ${Math.random()}, ${Math.random()})`;
-            const duration = randomize(.5, 2); // Adjust the duration as needed
-            // Apply the animation
-            img.style.transition = `left ${duration}s ${timingFunction}, top ${duration}s ${timingFunction}`;
+                //?? WIP not sure this helps make the animation more organic/erratic
+                // Use cubic-bezier timing function for the animation
+                const timingFunction = `cubic-bezier(${Math.random()}, ${Math.random()}, ${Math.random()}, ${Math.random()})`;
+                const duration = randomize(.5, 2); // Adjust the duration as needed
+                // Apply the animation
+                img.style.transition = `left ${duration}s ${timingFunction}, top ${duration}s ${timingFunction}`;
 
-            const mothHeight = randomize(20, 90);
-            img.style.height = mothHeight + "vh";
-            imgDiv.appendChild(img);
-            setInterval(() => flutter(img, imgDiv.offsetWidth/2, imgDiv.offsetHeight/2, 200), duration*1000);
-        // }
+                const mothHeight = randomize(20, 80);
+                img.style.height = mothHeight + "vh";
+                imgDiv.appendChild(img);
+                setInterval(() => flutter(img, imgDiv.offsetWidth/2, imgDiv.offsetHeight/2, 200), duration*1000);
+            // }
+
+            lineIndex++;
+            imgDiv.classList.add(`line${lineIndex}`);
+            imgDiv.setAttribute('data-index', lineIndex);
+
+        }
         
-
-        lineIndex++;
-        imgDiv.classList.add(`line${lineIndex}`);
-        imgDiv.setAttribute('data-index', lineIndex);
         
     }
     
@@ -412,18 +406,6 @@ function checkScroll(event) {
                 
             }
         }
-        // Same logic as above: these conditions help ensure that scrollingUp() only runs one time, as soon as a stickyDiv is unfixed from the top. Then the stickyDiv loses its .latest and therefore won't scrollingUp() a second time.
-        // else if (isBelowTop) {
-        //     if (currentScrollTop < lastScrollTop && isLatest && !isFakesticky) {
-        //         fakestickyScrollDifference = 0;
-        //         shadowIndex = parseInt(stickyDiv.getAttribute('data-index'), 10) -1;
-        //         scrollingUp();
-        //     }
-        // }
-
-        //this is so that multiple duplicate shadow lines aren't added for the same stickyDiv
-        //?? I'm putting this after the isAtOrAboveTop just to make sure that the .latest class isn't removed from the stickyDiv before scrollingDown has a chance to run once. But I don't know if that actually makes a difference?
-        // stickyDiv.classList.toggle("latest", isAtOrAboveTop);
         
     });
 
@@ -432,7 +414,6 @@ function checkScroll(event) {
 
 
 function scrollingDown(stickyDiv, isFakesticky, isHole) {
-    // makeBGMoth();
 
     //ADD SHADOW LINE
     //??For some reason a random "" is prepended at the start of the shadowTextContainer at the first clonenode??
@@ -526,15 +507,23 @@ window.onbeforeunload = function() {
     window.scrollTo(0, 0);
 };
 
+//detect if touchscreen
+if ('ontouchstart' in window || navigator.maxTouchPoints) {
+    // The device supports touch events
+    console.log("Touch events supported");
+    touchDevice = true;
+} else {
+    // The device does not support touch events
+    touchDevice = false;
+}
+
 function init() {
     insertTexts(chapter1, chapter1Texts);
     insertTexts(chapter2, chapter2Texts);
 
-    //get container height only once all stickyDivs have been inserted!
-    totalHeight = container.scrollHeight;
-    console.log(totalHeight);
-
-    createMovingDivs();
+    if (touchDevice) {
+        createMovingDivs();
+    }
     // updateSticky();
 
     window.addEventListener('scroll', checkScroll);
