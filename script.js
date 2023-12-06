@@ -3,9 +3,11 @@ let touchDevice = false;
 let mothContainers = null;
 let flutterIntervals = [];
 let lineIndex = 0;
+let chapterNum = 0;
 const container = document.querySelector(".container");
 const chapter1 = document.querySelector(".chapter1");
 const chapter2 = document.querySelector(".chapter2");
+const chapter3 = document.querySelector(".chapter3");
 const shadowTextContainer = document.querySelector(".shadowTextContainer");
 const allMothsContainer = document.querySelector(".allMothsContainer");
 let stickyDivs = [];
@@ -43,6 +45,11 @@ const mothImgs = [
 //     "imgs/holes/hole2.png",
 // ];
 
+const headerImgs = [
+    "imgs/scan_words/emergence.png",
+    "imgs/scan_words/inheritance.png",
+    "imgs/scan_words/passing_on.png",
+]
 
 const chapter1Texts = [
     "One theory was that the disease started when the moths ate through the archives. Perhaps they were attracted by their disuse, all that history unnourished by life. There was no need for book burning when you could just let them mold. From the moths, the history passed to the bees, the cicadas, the butterflies, the roaches, the locusts, and the maggots. No one noticed a difference in their behaviors.",
@@ -50,15 +57,30 @@ const chapter1Texts = [
     "Either way, it was not long before humans became carriers.",
     "Dejavu is the first sign. The sights, sounds, smells come from elsewhere. First in passing, then in pursuit. Faces as old as new, intimate conversations with strangers, unfamiliar objects fitting snugly in the hand.",
     "It was the cicadas, the ones that come every 17 years. My grandmother remembers seeing them everywhere, on the trees, the buildings, the ground. One couldn’t walk without catching a fistful of vibrating wings. It was like rain. Some people wielded umbrellas as shields.",
-    "She was blindsided by her first exposure. It was a hot day in August. She had to go out to buy some groceries. She was standing at the crosswalk, waiting for the light to turn. All around her was sound. She felt that all the vibration generated a heat that made the already sweltering weather even more unbearable. The buzzing began to sound like language when suddenly she found herself in a mass of heaving bodies, chanting words in a language she did not understand. The man on stage wore a strange, tall cone of a hat with scribblesd on it, his head hung low, but familiar in a way that terrified her.",
+    "She was blindsided by her first exposure. It was a hot day in August. She had to go out to buy some groceries. She was standing at the crosswalk, waiting for the light to turn. All around her was sound. She felt that all the vibration generated a heat that made the already sweltering weather even more unbearable. The buzzing began to sound like language when suddenly she found herself in a mass of heaving bodies, chanting words in a language she did not understand. The man on stage wore a strange, tall cone of a hat with scribbles on it, his head hung low, but familiar in a way that terrified her.",
     "She later learned that one of her mother’s memories had found her. It turns out that it is quite common for the insects to mistake the relatives of the memories’ former inhabitants for the inhabitants themselves. It is still a mystery how they find their ways to us. Some scientists have proposed that they are attracted to our blood like sugar water. Others have found that these new species of moths are attracted to darkness, and find refuge in the murky crevices within our bodies. Maybe no darkness is the same, but it is inherited.",
     "It was not long before serious cases appeared. During dinner, an elderly woman was sabotaged with visions of relatives’ emaciated limbs and swollen bellies, and lost her sight. In the middle of a meeting, a middle-aged man pleaded with his employer to lower his gun and spare his life, swearing that he was not a Communist like his brother.",
+    "Governments and hospitals scrambled to classify and contain the rapidly spreading disease. It wasn’t long before the men in white suits came and sealed their apartment doors from the outside, and then entire buildings, complexes, even cities. Temporary field hospitals were hastily set up to accommodate the sudden outbreak. People were sprayed with pesticides at checkpoints. Once it regained its bearings after the first few emergences, the government tried to predict the mass eruptions and squash the nymphs as they surfaced from the ground. The insects that had not yet nested into hosts were collected in batches, and passed through shredding trucks. They came out the other end as fluffy snowdrifts, soft confetti. But there never seemed to be enough trucks.",
+    "Most of those afflicted hovered around stages 1 and 2, and learned to live with the spates of buzzing and accompanying impulse to pass on their visions. The urge would break over you like a combination of immense nausea and intelligible tinnitus. It was horrible, but you grew used to bearing with it. You could track a person’s progression in the disease with the frequency of their compulsive outpourings, in person or online, as their profile filled up with pleas to never forget some obscure date, eulogies for strangers, reminiscences directed at no one in particular. As soon as anyone advanced to stage 3, the government automatically shut down their social media accounts. They knew that soon they would be ranting their memories to any ear and any online forum within reach, sometimes by force if necessary. Stage 4 was comparatively quiet. Locked in their rooms or roaming the streets, they would chitter, twitch, and click around, looking for things with antennae they didn't have. People learned to avoid those who were too far gone. It wouldn’t be long before the white suits took them away.",
+    "For all the glowing advertisements and state endorsements, surgery produced mixed results. The location where the insects made their nests seemed arbitrary. Some colonies would be found resting atop or within the folds of the brain, others in between the folds of intestines, others beneath the shin. Usually patients left the operating table with some part of their body missing, with no guarantee that any stray eggs wouldn’t briskly repopulate.",
+    "Doctors dissected the insects, trying to find some organ of memory, some special synapse, but all their medical examinations, their clinical trials, produced the simple result that they were only bugs. It was like trying to uncover the location of the human soul.",
+    "It was taboo to acknowledge aloud, but the illness was not always just something to cope with. To some, maybe a number more than can be admitted, the infection came as a relief, a gift. Some greeted their parasites as old friends, others revered them as mediums, and all evaded treatment. For them, the humming was as grounding as it was disorienting. They came to develop a feeling of responsibility for the wellbeing of their inhabitants, terror even at the thought of their leaving, and thus tried to condition their interiors to be as welcoming as possible. But the insects are cruel. They always overstay their welcome in the bodies of those who don't want them, and leave early from those who don't want to let them go.",
+    // "",
+    // "",
+    // "",
     // "",
     
 ];
 
 const chapter2Texts = [
     "Then, once the children started to cry and gaze strangely into the distance, it was discovered that the insects were hereditary. Like a woman whose grandmother’s features only surface in her face in adulthood, usually you didn’t find out what you inherited till much later. You could try to predict when a brood would emerge, but it was not always reliable. Sometimes, when the weather was warm, you ate something wrong, or some other obscure conditions were met, they would hatch early.",
+    //?? NOT ACTUALLY CHAPTER 2, BUT JUST PUTTING THEM HERE FOR NOW
+]
+
+const chapter3Texts = [
+    "Ten years after her first infection and five years after I had moved abroad, my mother was hospitalized. When I returned to visit her, I could hear the humming as soon as I entered the room. When she opened her mouth, I saw hundreds of vibrating wings, rising rhythmically with the sound. The doctor had warned me that they had replaced most of her tongue.",
+    "Those who, like my mother, reached the terminal stage of possession were completely immobilized. They stayed frozen in place at the site of the final outbreak, their brains flooded with the past. There was no future for those who had progressed to this stage — the activity of memory occupied so much of their being that they could not even eat or drink, and soon even blinking and breathing would be beyond them. Rumors circulated that some terminal cases would shed their skins and molt, flying away.",
+    "I did not witness so spectacular an emergence in my mother’s last moments. Yet, looking into her eyes, I saw something liquid move behind them. When I touched her, her edges were soft. Later I saw moths gathering at her grave.",
 ]
 
 
@@ -229,12 +251,27 @@ function findHighestDataIndex() {
 
 //INSERT TEXTS
 function insertTexts(chapter, texts) {
+    const headerDiv = document.createElement('div');
+        headerDiv.classList.add("header");
+        headerDiv.classList.add("fakesticky");
+        lineIndex++;
+        headerDiv.classList.add(`line${lineIndex}`);
+        headerDiv.setAttribute('data-index', lineIndex);
+
+        const headerImg = document.createElement("img");
+        headerImg.src = headerImgs[chapterNum];
+
+        chapter.prepend(headerDiv);
+        headerDiv.appendChild(headerImg);
+        chapterNum++;
     for (var i = 0; i < texts.length; i++) {
+
         const paragraphDiv = document.createElement('p');
         const parentElement = chapter.querySelector(".textContainer");
         parentElement.appendChild(paragraphDiv);
         const paragraphText = texts[i];
         insertTextWithLineBreaks(paragraphText, paragraphDiv);
+        
 
         if (!touchDevice) {
             //add bookworm hole at end of each paragraph
@@ -520,6 +557,7 @@ if ('ontouchstart' in window || navigator.maxTouchPoints) {
 function init() {
     insertTexts(chapter1, chapter1Texts);
     insertTexts(chapter2, chapter2Texts);
+    insertTexts(chapter3, chapter3Texts);
 
     if (touchDevice) {
         createMovingDivs();
