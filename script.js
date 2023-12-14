@@ -89,6 +89,8 @@ const chapter3Texts = [
 
 // TOUCH EVENTS
 document.addEventListener('touchstart', function(event) {
+    //??This breaks eventually
+    createMovingDivs(1);
     const touch = event.touches[0]; // Consider the first touch for simplicity
     console.log(event.touches);
     const x = touch.clientX;
@@ -105,9 +107,7 @@ document.addEventListener('touchend', function(event) {
 
 //CREATE N NUMBER OF MOTHS AT WINDOW EDGES (used in init)
 // Function to create divs at random positions
-function createMovingDivs() {
-    const numDivs = 3; // Number of divs to create
-    
+function createMovingDivs(numDivs) {
     for (let i = 0; i < numDivs; i++) {
         const [edgeX, edgeY] = getEdgePositions();
         makeMoth("moth_container", edgeX, edgeY);
@@ -300,15 +300,15 @@ function insertTexts(chapter, texts) {
 
                 //?? WIP not sure this helps make the animation more organic/erratic
                 // Use cubic-bezier timing function for the animation
-                const timingFunction = `cubic-bezier(${Math.random()}, ${Math.random()}, ${Math.random()}, ${Math.random()})`;
-                const duration = randomize(.5, 2); // Adjust the duration as needed
-                // Apply the animation
-                img.style.transition = `left ${duration}s ${timingFunction}, top ${duration}s ${timingFunction}`;
+                // const timingFunction = `cubic-bezier(${Math.random()}, ${Math.random()}, ${Math.random()}, ${Math.random()})`;
+                // const duration = randomize(.5, 2); // Adjust the duration as needed
+                // // Apply the animation
+                // img.style.transition = `left ${duration}s ${timingFunction}, top ${duration}s ${timingFunction}`;
 
                 const mothHeight = randomize(20, 80);
                 img.style.height = mothHeight + "vh";
                 imgDiv.appendChild(img);
-                setInterval(() => flutter(img, imgDiv.offsetWidth/2, imgDiv.offsetHeight/2, 200), duration*1000);
+                // setInterval(() => flutter(img, imgDiv.offsetWidth/2, imgDiv.offsetHeight/2, 200), duration*1000);
             // }
 
             lineIndex++;
@@ -390,7 +390,7 @@ function insertTextWithLineBreaks(text, parentElement) {
     }
 
     // define stickyDivs only once they have all been generated!
-    stickyDivs = document.querySelectorAll('.sticky, .fakesticky');
+    // stickyDivs = document.querySelectorAll('.sticky, .fakesticky');
 }
 
 //SCROLLING FUNCTIONS
@@ -540,6 +540,7 @@ function flutter(mothContainer, x, y, variation) {
 
 // set the window to start at the top each time I reload the page
 window.onbeforeunload = function() {
+    //??this won't work for touchdevice
     history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
 };
@@ -554,22 +555,59 @@ if ('ontouchstart' in window || navigator.maxTouchPoints) {
     touchDevice = false;
 }
 
+
 function init() {
+    if (touchDevice) {
+        //??Tried to get this so shadowtextcontainer and textcontainer would match in width and therefore be affecting by .container's flexbox the same, but they're still misaligned??
+        let root = document.documentElement;
+        root.style.setProperty('--screenWidth', 
+        window.screen.width + "px");
+    }
+
     insertTexts(chapter1, chapter1Texts);
     insertTexts(chapter2, chapter2Texts);
     insertTexts(chapter3, chapter3Texts);
 
-    if (touchDevice) {
-        createMovingDivs();
-    }
-    // updateSticky();
+    const containerClone = container.cloneNode(true);
+    document.body.appendChild(containerClone);
+
+    stickyDivs = document.querySelectorAll('.sticky, .fakesticky');
+    const holes = document.querySelectorAll('.hole');
+    holes.forEach(hole => {
+        const holeMoth = hole.querySelector(".holeMoth");
+
+        //?? WIP not sure this helps make the animation more organic/erratic
+        // Use cubic-bezier timing function for the animation
+        const timingFunction = `cubic-bezier(${Math.random()}, ${Math.random()}, ${Math.random()}, ${Math.random()})`;
+        const duration = randomize(.5, 2); // Adjust the duration as needed
+        // Apply the animation
+        holeMoth.style.transition = `left ${duration}s ${timingFunction}, top ${duration}s ${timingFunction}`;
+
+        setInterval(flutter(holeMoth, hole.offsetWidth/2, hole.offsetHeight/2, 200), duration*1000);
+
+    });
+
+    //??Trying to figure out infinite scroll
+    let remove = true;
+    document.onscroll = function() {
+        const halfway = (document.body.scrollHeight)/2;
+        const currentScrollPos = window.scrollY;
+        // Check if the user has scrolled to the bottom of the document
+        if (currentScrollPos >= halfway && remove) {
+            console.log('You have scrolled to the bottom!');
+            // const containers = document.querySelectorAll(".container");
+            // document.body.appendChild(containers[0].cloneNode(true));
+            // containers[0].remove();
+            // remove = false;
+            // setTimeout(()=>remove = true,3000);
+        }
+    };
+
 
     window.addEventListener('scroll', checkScroll);
+    // updateSticky();
     // window.addEventListener('resize', updateSticky);
 
 }
 
 init();
-
-
-

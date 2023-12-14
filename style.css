@@ -1,3 +1,9 @@
+
+:root {
+    --screenWidth: 500px;
+    --bodyMargin: 1em;
+}
+
 @font-face {
     font-family: "Pirelli_Regular";
     src:
@@ -22,7 +28,7 @@ body {
     color:white;
     /* background:white;
     color:black; */
-    margin:1em;
+    margin:var(--bodyMargin);
     /* position:relative; */
 
     display:flex;
@@ -37,19 +43,16 @@ body {
 ::-webkit-scrollbar {
     width: 10px;
   }
-  
   /* Track */
   ::-webkit-scrollbar-track {
     background: black;
   }
-   
   /* Handle */
   ::-webkit-scrollbar-thumb {
     /* background:white; */
     background: url('imgs/scan_words/scrollbar.png') black;
     background-size: cover; 
   }
-  
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
     background: #555; 
@@ -79,8 +82,9 @@ img {
 }
 
 /* TEXT STYLING */
-.container, .allMothsContainer, .shadowTextContainer {
-    max-width:500px;
+.container, .allMothsContainer, .textContainer, .shadowTextContainer, .chapter {
+    width:100%;
+    max-width:var(--screenWidth);
 }
 
 .container {
@@ -94,19 +98,14 @@ img {
 }
 
 .chapter {
-    width:100%;
     /* ??I need to specify this as 500px even though I already say width:100%, otherwise the width of the text container freaks out */
-    width:500px;
+    /* width:500px; */
     margin-bottom:4em;
     margin-top:90vh;
 }
 
-.header, .textContainer, .shadowTextContainer {
-    width:100%;
-    /* background:blue; */
-}
-
 .header {
+    width:100%;
     /* height:100vh; */
     /* margin:1em 0; */
     display:flex;
@@ -171,7 +170,6 @@ span.temp {
 
 }
 
-/* ??Why does this shift to the left on touchscreen? */
 .shadowTextContainer {
     z-index:-1;
     overflow-y: visible;
@@ -299,4 +297,11 @@ span.temp {
 /* ??toggling this produces a wierd effect on reverse, where unsticked images "blink" before reappearing */
 .transparent {
     opacity:0;
+}
+
+
+@media (max-width: 500px) and (hover: none) {
+    .shadowTextContainer {
+        padding: var(--bodyMargin);
+    }
 }
