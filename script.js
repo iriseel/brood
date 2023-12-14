@@ -572,6 +572,7 @@ function init() {
     document.body.appendChild(containerClone);
 
     stickyDivs = document.querySelectorAll('.sticky, .fakesticky');
+    //??moth animations not applying
     const holes = document.querySelectorAll('.hole');
     holes.forEach(hole => {
         const holeMoth = hole.querySelector(".holeMoth");
