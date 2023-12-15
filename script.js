@@ -99,10 +99,15 @@ const chapter3Texts = [
 
 // TOUCH EVENTS
 document.addEventListener('touchstart', function(event) {
-    //??This breaks eventually
-    createMovingDivs(1);
+    mothContainers = document.querySelectorAll(".moth_container");
+    // console.log(mothContainers);
+    if (mothContainers.length > 6) {
+    }
+    else {
+        createMovingDivs(1);
+    }
     const touch = event.touches[0]; // Consider the first touch for simplicity
-    console.log(event.touches);
+    // console.log(event.touches);
     const x = touch.clientX;
     const y = touch.clientY;
    
@@ -579,6 +584,7 @@ function init() {
     insertTexts(chapter3, chapter3Texts);
 
     const containerClone = container.cloneNode(true);
+    // ?? mobile ver breaks when it reaches the clone
     document.body.appendChild(containerClone);
 
     stickyDivs = document.querySelectorAll('.sticky, .fakesticky');
