@@ -8,6 +8,7 @@ const container = document.querySelector(".container");
 const chapter1 = document.querySelector(".chapter1");
 const chapter2 = document.querySelector(".chapter2");
 const chapter3 = document.querySelector(".chapter3");
+const chapter4 = document.querySelector(".chapter4");
 const shadowTextContainer = document.querySelector(".shadowTextContainer");
 const allMothsContainer = document.querySelector(".allMothsContainer");
 let stickyDivs = [];
@@ -47,6 +48,7 @@ const mothImgs = [
 
 const headerImgs = [
     "imgs/scan_words/emergence.png",
+    "imgs/scan_words/coming_of_age.png",
     "imgs/scan_words/inheritance.png",
     "imgs/scan_words/passing_on.png",
 ]
@@ -62,8 +64,9 @@ const chapter1Texts = [
     "The disease baffled scientists, doctors, and engineers alike. However, eventually they were able to narrow down the vector of infection to links. Opening any link, sent by anyone, was enough to transmit the disease — health articles, memes, videos, news, emails, conference calls. And regardless of what link it was, the infection came in waves — every one, thirteen, and seventeen years. My mother had been infected along with 2 million other people. Lastly, they also determined that the incubation period of the disease varied — some might immediately experience symptoms upon infection, as my mother did, and others might go months and even years before suddenly being pulled back into a memory. Like a woman whose grandmother’s features only surface in her face in adulthood, usually you didn’t find out what you were infected with till much later. You could try to predict when a brood might emerge, but it was not always reliable. Sometimes, when the weather was warm, you ate something wrong, or some other obscure conditions were met, they would hatch early.",
     "It was not long before serious cases appeared. During dinner, an elderly woman was sabotaged by visions of her nieces’ and nephews’ emaciated limbs and swollen bellies, and lost her sight. In the middle of a meeting, a middle-aged man pleaded with his employer to lower his gun and spare his life, swearing that he was not a Communist like his brother.",
     "Governments and hospitals scrambled to classify and contain the rapidly spreading disease. It wasn’t long before the men in white suits came and sealed their apartment doors from the outside, and then entire buildings, complexes, even cities. Temporary field hospitals were hastily set up to accommodate the sudden outbreak. People were sprayed with pesticides at checkpoints. Once the government regained its bearings, it tried to predict mass eruptions and set up firewalls to squash suspicious links. But the security systems never detected anything. The only possible way to stop the spread would have been to take down the web entirely, but no corporation or nation could accept that. And by that point, the disease had already spread almost everywhere. So, while the off-grid industry experienced a major boom, most of the world just kept on scrolling.",
+]
 
-    //!!SYMPTOMS CHAPTER TEXT, TEMPORARILY PUT HERE
+const chapter2Texts = [
     "Dejavu is the first sign. The sights, sounds, smells come from elsewhere. First in passing, then in pursuit. Faces as old as new, intimate conversations with strangers, unfamiliar objects fitting snugly in the hand. And then, the need to tell someone, to share the sight.",
     "Most of those afflicted hover around stages 1 and 2, and learn to live with the spates of buzzing and the accompanying impulse to pass on their visions. The urge breaks over you like a combination of immense nausea and intelligible tinnitus. The sights and sounds build inside you, pushing their way to all your surfaces, and the only way to ease the pressure is to let them out, forever. It’s horrible, but you learn to bear it.",
     "Or not. As the disease progresses, you might find yourself prone to compulsive outpourings, in person or online, spamming your address book with links as your profile fills up with pleas to never forget some obscure date, eulogies for strangers, reminiscences directed at no one in particular. As soon as you advance to stage 3, the government automatically shuts down your social media accounts. They know that soon you’ll be ranting “your” memories to any ear and any online forum within reach, sometimes by force if necessary. Stage 4 is comparatively quiet. Locked in your room or roaming the streets, you chitter, twitch, and click around, looking for things with antennae you don’t have. People have learned to avoid those who were too far gone. It won’t be long before the white suits take you away.",
@@ -73,7 +76,7 @@ const chapter1Texts = [
     
 ];
 
-const chapter2Texts = [
+const chapter3Texts = [
     "When I was a child, I cried incessantly. I did not understand what I was seeing. The older adults around me would always ask me what I was looking at that made me weep so. It was only once I had the words to tell them about the man in the tall paper hat, and the chorus that sounded like the language baba and mama spoke, that they realized.",
     "At that point, my mother was still able to manage her sickness. I was too young to know the depth of it. I only felt that sometimes she looked right through me. But when she found out about my symptoms, she could no longer bear to look at me at all. She began to babble, sometimes right in the middle of a conversation, about the cabbages that glimmered with frost on the balcony. The winter cold was a natural refrigerator. She was so sick of eating cabbage all the time. When could they eat something else?",
     "I was sent to a boarding school on the other side of the country. The memories followed me there. In that foreign place, their chittering was almost a solace. When I had not yet learned to resent my mother, they felt like the only connection I still had with her. I eventually could repeat all the words spoken in those memories by heart, though nobody from my family was willing to tell me what they meant. It was only when I met an international student from my mother’s original country that I learned their meaning.",
@@ -86,7 +89,7 @@ const chapter2Texts = [
     // "",
 ]
 
-const chapter3Texts = [
+const chapter4Texts = [
     "Forty years after her first infection, twenty years after my first symptoms, and five years after I had moved to another country, my mother was hospitalized for the last time. When I returned to visit her, I could hear the humming as soon as I entered the room. She opened her mouth and I saw hundreds of vibrating wings, rising rhythmically with the sound. The doctor had warned me that they had replaced most of her tongue.",
     "Those who, like my mother, reached the terminal stage of possession were completely immobilized. They stayed frozen in place at the site of the final outbreak, their brains flooded with the past. There was no future for those who had progressed to this stage — the activity of memory occupied so much of their being that they could not even eat or drink, and soon even blinking and breathing would be beyond them. Rumors circulated that some terminal cases would shed their skins and molt, flying away.",
     "I did not witness so spectacular an emergence in my mother’s last moments. Yet, looking into her eyes, I saw something liquid move behind them. A flash of downy white. When I touched her, her edges were soft and trembling, warm with a heat abnormal for a body so close to death, a heat that instead should have belonged to multiple bodies. A year later, I saw moths gathering at her grave. They rose into the sky like rising snow.",
@@ -329,7 +332,9 @@ function insertTexts(chapter, texts) {
             //add bookworm hole at end of each paragraph
             //hole mask
             //add more holes the further in the text you are
-            const numHoles = Math.ceil(randomize(1, (i+1)/2));
+            
+            const numHoles = Math.floor(randomize(chapterNum, chapterNum+2));
+            console.log(chapterNum);
             for (var s = 0; s < numHoles; s++) {
                 const imgDiv = document.createElement('div');
                 imgDiv.classList.add("hole");
@@ -610,17 +615,17 @@ function burial() {
         });
     }
 
-    const bgMoths = document.querySelectorAll(".bgMoth");
-    bgMoths.forEach((bgMoth) => {
-        bgMoth.querySelector("img").src= mothImgs[Math.floor(Math.random() * mothImgs.length)];
-        // Use cubic-bezier timing function for the animation
-        const timingFunction = `cubic-bezier(${Math.random()}, ${Math.random()}, ${Math.random()}, ${Math.random()})`;
-        const duration = randomize(2, 4); // Adjust the duration as needed
-        // Apply the animation
-        bgMoth.style.transition = `transform ${duration}s ${timingFunction}`;
+    // const bgMoths = document.querySelectorAll(".bgMoth");
+    // bgMoths.forEach((bgMoth) => {
+    //     bgMoth.querySelector("img").src= mothImgs[Math.floor(Math.random() * mothImgs.length)];
+    //     // Use cubic-bezier timing function for the animation
+    //     const timingFunction = `cubic-bezier(${Math.random()}, ${Math.random()}, ${Math.random()}, ${Math.random()})`;
+    //     const duration = randomize(2, 4); // Adjust the duration as needed
+    //     // Apply the animation
+    //     bgMoth.style.transition = `transform ${duration}s ${timingFunction}`;
 
-        setInterval(() => bgFlutter(bgMoth, 100), duration*1000);
-    });
+    //     setInterval(() => bgFlutter(bgMoth, 100), duration*1000);
+    // });
     
     
 }
@@ -654,6 +659,7 @@ function init() {
     insertTexts(chapter1, chapter1Texts);
     insertTexts(chapter2, chapter2Texts);
     insertTexts(chapter3, chapter3Texts);
+    insertTexts(chapter4, chapter4Texts);
 
     const containerClone = container.cloneNode(true);
     // ??? mobile ver breaks when it reaches the clone

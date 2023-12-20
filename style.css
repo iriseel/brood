@@ -88,7 +88,7 @@ img {
     z-index:-100;
     top:200vh;
     width: calc((100vw - var(--screenWidth)) / 2);
-    opacity:.7;
+    opacity:.6;
 }
 
 .leftContainer img.burial, .rightContainer img.burial, .bgMoth {
@@ -97,10 +97,10 @@ img {
 }
 
 .leftContainer img.burial, .rightContainer img.burial, .bgMoth img {
-    width: auto;
-    max-width:50%;
-    max-height: 500px;
-    filter:drop-shadow(0 0 0.1em rgba(255,255,255, .7));
+    width: 50%;
+    /* max-width:50%;
+    max-height: 500px; */
+    filter:drop-shadow(0 0 0.1em rgba(255,255,255, 1));
 }
 
 .leftContainer {
