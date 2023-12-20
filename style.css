@@ -35,6 +35,7 @@ body {
     flex-flow: column wrap;
     justify-content: center;
     align-content: center;
+    overflow-x:hidden;
 
 }
 
@@ -79,6 +80,42 @@ img {
     transform: translate(-20%,-80%);
     background:white;
     filter: blur(8px);
+}
+
+
+.leftContainer, .rightContainer {
+    position:absolute;
+    z-index:-100;
+    top:200vh;
+    width: calc((100vw - var(--screenWidth)) / 2);
+    opacity:.7;
+}
+
+.leftContainer img.burial, .rightContainer img.burial, .bgMoth {
+    position:absolute;
+    top:0;
+}
+
+.leftContainer img.burial, .rightContainer img.burial, .bgMoth img {
+    width: auto;
+    max-width:50%;
+    max-height: 500px;
+    filter:drop-shadow(0 0 0.1em rgba(255,255,255, .7));
+}
+
+.leftContainer {
+    left:0;
+}
+
+.rightContainer {
+    right:0;
+}
+
+.bgMoth img {
+    width:auto;
+    height:auto;
+    max-width:none;
+    max-height:none;
 }
 
 /* TEXT STYLING */
@@ -242,6 +279,7 @@ span.temp {
     /* ?? this seems important somehow as a possible reason behind the scroll wiggle room - when overflow:visible, you can scroll back infinitely */
     overflow:hidden;
     /* background:red; */
+    margin:2em 0;
 }
 
 .holeMoth {

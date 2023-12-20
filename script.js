@@ -93,32 +93,51 @@ const chapter3Texts = [
     // "",
 ]
 
-
-//every year
-// setInterval(() => popup(fireworksImgs, fireworksImgsCounter), 31556926000);
-
 // TOUCH EVENTS
-document.addEventListener('touchstart', function(event) {
-    mothContainers = document.querySelectorAll(".moth_container");
-    // console.log(mothContainers);
-    if (mothContainers.length > 6) {
-    }
-    else {
-        createMovingDivs(1);
-    }
-    const touch = event.touches[0]; // Consider the first touch for simplicity
-    // console.log(event.touches);
-    const x = touch.clientX;
-    const y = touch.clientY;
-   
-    clearAllFlutterIntervals();
-    sendMothstoTarget(x, y);
-})
 
+function touched() {
+    let startY;
 
-document.addEventListener('touchend', function(event) {
-    setTimeout(() => sendMothstoEdges(), 1000);
-})
+    // window.addEventListener('touchstart', onTouchStart, { passive: true });
+
+    document.addEventListener('touchstart', function(event) {
+        mothContainers = document.querySelectorAll(".moth_container");
+        // console.log(mothContainers);
+        if (mothContainers.length > 6) {
+        }
+        else {
+            createMovingDivs(1);
+        }
+        const touch = event.touches[0]; // Consider the first touch for simplicity
+        // console.log(event.touches);
+        const x = touch.clientX;
+        const y = touch.clientY;
+       
+        clearAllFlutterIntervals();
+        sendMothstoTarget(x, y);
+    })
+
+    // window.addEventListener('touchmove', preventTouchScroll, { passive: false });
+    
+    document.addEventListener('touchend', function(event) {
+        setTimeout(() => sendMothstoEdges(), 1000);
+    })
+
+    function onTouchStart(event) {
+        // Capture the starting Y coordinate of the touch event
+        startY = event.touches[0].clientY;
+    }
+
+    function preventTouchScroll(event) {
+        // Calculate the vertical distance moved since touchstart
+        const deltaY = event.touches[0].clientY - startY;
+    
+        // Prevent scrolling up (deltaY < 0) while allowing scrolling down (deltaY > 0)
+        if (deltaY < 0) {
+            event.preventDefault();
+        }
+    }
+}
 
 //CREATE N NUMBER OF MOTHS AT WINDOW EDGES (used in init)
 // Function to create divs at random positions
@@ -168,10 +187,27 @@ function randomize(min, max) {
     return min + Math.random() * (max - min);
 }
 
+//WIP: CLEAN UP SOMEHOW
+// FLUTTER ANIMATIONS
+function flutter(mothContainer, x, y, variation) {
+    x = randomize(x - variation, x + variation);
+    y = randomize(y - variation, y + variation);
+    
+    positionDiv(mothContainer, x, y);
+}
+
 function positionDiv(div, x, y) {
     div.style.left = `${x}px`;
     div.style.top = `${y}px`;
 }
+
+
+function bgFlutter(div, variation) {
+    const x = randomize(-variation, variation);
+    const y = randomize(-variation, variation);
+    div.style.transform = `translateX(${x}px) translateY(${y}px)`;
+}
+
 
 function doesClassContain(element) {
     const classList = Array.from(element.classList);
@@ -279,6 +315,7 @@ function insertTexts(chapter, texts) {
         chapter.prepend(headerDiv);
         headerDiv.appendChild(headerImg);
         chapterNum++;
+        
     for (var i = 0; i < texts.length; i++) {
 
         const paragraphDiv = document.createElement('p');
@@ -291,44 +328,42 @@ function insertTexts(chapter, texts) {
         if (!touchDevice) {
             //add bookworm hole at end of each paragraph
             //hole mask
-            const imgDiv = document.createElement('div');
-            imgDiv.classList.add("hole");
-            imgDiv.classList.add("fakesticky");
-            const holeWidth = randomize(10, 40);
-            const holeHeight = randomize(10, 30);
-            const holeMargin = randomize(0, 100 - holeWidth);
-            imgDiv.style.width = holeWidth + "%";
-            imgDiv.style.height = holeHeight + "vh";
-            //the -1em is to account for the body's 1em margin
-            imgDiv.style.marginLeft = `calc(${holeMargin}% - 1em)`;
-            parentElement.appendChild(imgDiv);
+            //add more holes the further in the text you are
+            const numHoles = Math.ceil(randomize(1, (i+1)/2));
+            for (var s = 0; s < numHoles; s++) {
+                const imgDiv = document.createElement('div');
+                imgDiv.classList.add("hole");
+                imgDiv.classList.add("fakesticky");
+                const holeWidth = randomize(10, 40);
+                const holeHeight = randomize(10, 30);
+                const holeMargin = randomize(0, 100 - holeWidth);
+                imgDiv.style.width = holeWidth + "%";
+                imgDiv.style.height = holeHeight + "vh";
+                //the -1em is to account for the body's 1em margin
+                imgDiv.style.marginLeft = `calc(${holeMargin}% - 1em)`;
+                parentElement.appendChild(imgDiv);
+    
+                //hole moth
+                //?? Adding holemoths seems to mess up the scrolling a little, introduces wiggle room for scrolling back up, and extra down (so that the scanner line is scrolled past), which shouldn't be allowed at all. This problem only happens on touchscreen, not when it's desktop!
+                const numHoleMoths = Math.floor(randomize(1, 3));
+                // use different var here, not i, which has been used above
+                // for (var j = 0; j < numHoleMoths; j++) {
+                    const img = document.createElement('img');
+                    img.classList.add("holeMoth");
+                    const randomImageUrl = mothImgs[Math.floor(Math.random() * mothImgs.length)];
+                    img.src = randomImageUrl;
+    
+                    const mothHeight = randomize(20, 80);
+                    img.style.height = mothHeight + "vh";
+                    imgDiv.appendChild(img);
+                // }
+    
+                lineIndex++;
+                imgDiv.classList.add(`line${lineIndex}`);
+                imgDiv.setAttribute('data-index', lineIndex);
+            }
 
-            //hole moth
-            //?? Adding holemoths seems to mess up the scrolling a little, introduces wiggle room for scrolling back up, and extra down (so that the scanner line is scrolled past), which shouldn't be allowed at all. This problem only happens on touchscreen, not when it's desktop!
-            // ??Adding this iteration seems to break the page?
-            // const numHoleMoths = randomize(1, 2);
-            // for (var i = 0; i < numHoleMoths; i++) {
-                const img = document.createElement('img');
-                img.classList.add("holeMoth");
-                const randomImageUrl = mothImgs[Math.floor(Math.random() * mothImgs.length)];
-                img.src = randomImageUrl;
-
-                //?? WIP not sure this helps make the animation more organic/erratic
-                // Use cubic-bezier timing function for the animation
-                // const timingFunction = `cubic-bezier(${Math.random()}, ${Math.random()}, ${Math.random()}, ${Math.random()})`;
-                // const duration = randomize(.5, 2); // Adjust the duration as needed
-                // // Apply the animation
-                // img.style.transition = `left ${duration}s ${timingFunction}, top ${duration}s ${timingFunction}`;
-
-                const mothHeight = randomize(20, 80);
-                img.style.height = mothHeight + "vh";
-                imgDiv.appendChild(img);
-                // setInterval(() => flutter(img, imgDiv.offsetWidth/2, imgDiv.offsetHeight/2, 200), duration*1000);
-            // }
-
-            lineIndex++;
-            imgDiv.classList.add(`line${lineIndex}`);
-            imgDiv.setAttribute('data-index', lineIndex);
+            
 
         }
         
@@ -414,11 +449,13 @@ function checkScroll(event) {
     const scrollDifference = currentScrollTop - lastScrollTop;
     // console.log(shadowIndex);
 
-    // disabling scrolling up so the user can only move forward
-    if (currentScrollTop < lastScrollTop) {
-        // event.preventDefault();
-        window.scrollTo(0, lastScrollTop);
-    }
+    // if (!touchDevice){
+        // disabling scrolling up so the user can only move forward
+        if (currentScrollTop < lastScrollTop) {
+            // event.preventDefault();
+            window.scrollTo(0, lastScrollTop);
+        }
+    // }
 
     stickyDivs.forEach(function(stickyDiv) {
 
@@ -533,29 +570,64 @@ function fakestickyScrollingDown(stickyDiv, scrollDifference) {
     
 }
 
-//WIP: CLEAN UP SOMEHOW
-// FLUTTER ANIMATIONS
-function bgFlutter(movingDiv) {
-    // Calculate new random positions
-    const newLeft = randomize(0, window.innerWidth);
-    const newTop = randomize(scrollY, scrollY + window.innerHeight);
 
-    // Move the div to the new positions
-    positionDiv(movingDiv, newLeft, newTop);
+function burial() {
+    // - 2*window.innerHeight is bc ins css, left and rightContainer are top:200vh;
+    const height = document.documentElement.scrollHeight - 2*window.innerHeight;
+    const leftContainer = document.querySelector(".leftContainer");
+    const rightContainer = document.querySelector(".rightContainer");
+    const leftImages = leftContainer.querySelectorAll("img");
+    const rightImages = rightContainer.querySelectorAll("img");
+    leftContainer.style.height = height + "px";
+    rightContainer.style.height = height + "px";
 
-}
+    spaceImages(leftImages, leftContainer);
+    spaceImages(rightImages, rightContainer);
 
-function flutter(mothContainer, x, y, variation) {
-    x = randomize(x - variation, x + variation);
-    y = randomize(y - variation, y + variation);
+    // Position each image vertically
+    function spaceImages(images, sideContainer) {
+        // Calculate the spacing between images
+        const spacing = height / (images.length - 1);
+
+        images.forEach(function (image, index) {
+            const position = index * spacing;
+            console.log(position);
+            image.style.transform = `translateY(${position}px)`;
+            let marginTop = randomize(-spacing/2, spacing/2);
+            if (index == 0) {
+                marginTop = randomize(0, spacing/2);
+            }
+            else if (index >= images.length - 1) {
+                marginTop = randomize(-spacing/2, 0);
+            }
+            image.style.marginTop = marginTop + "px";
+            const imageWidth = image.offsetWidth;
+            image.style.marginLeft = `calc(${randomize((sideContainer.offsetWidth - imageWidth)/4, sideContainer.offsetWidth - imageWidth*1.1)}px)`;
+
+            if (!getClassName(image, 'burial')) {
+                image.style.marginLeft=0;
+            };
+        });
+    }
+
+    const bgMoths = document.querySelectorAll(".bgMoth");
+    bgMoths.forEach((bgMoth) => {
+        bgMoth.querySelector("img").src= mothImgs[Math.floor(Math.random() * mothImgs.length)];
+        // Use cubic-bezier timing function for the animation
+        const timingFunction = `cubic-bezier(${Math.random()}, ${Math.random()}, ${Math.random()}, ${Math.random()})`;
+        const duration = randomize(2, 4); // Adjust the duration as needed
+        // Apply the animation
+        bgMoth.style.transition = `transform ${duration}s ${timingFunction}`;
+
+        setInterval(() => bgFlutter(bgMoth, 100), duration*1000);
+    });
     
-    positionDiv(mothContainer, x, y);
+    
 }
-
 
 // set the window to start at the top each time I reload the page
 window.onbeforeunload = function() {
-    //??this won't work for touchdevice
+    //???this won't work for touchdevice
     history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
 };
@@ -565,11 +637,11 @@ if ('ontouchstart' in window || navigator.maxTouchPoints) {
     // The device supports touch events
     console.log("Touch events supported");
     touchDevice = true;
+    touched();
 } else {
     // The device does not support touch events
     touchDevice = false;
 }
-
 
 function init() {
     if (touchDevice) {
@@ -584,15 +656,16 @@ function init() {
     insertTexts(chapter3, chapter3Texts);
 
     const containerClone = container.cloneNode(true);
-    // ?? mobile ver breaks when it reaches the clone
+    // ??? mobile ver breaks when it reaches the clone
     document.body.appendChild(containerClone);
 
     stickyDivs = document.querySelectorAll('.sticky, .fakesticky');
-    //??moth animations not applying
+    
+    //add animations at the end after the clones have been created
     const holes = document.querySelectorAll('.hole');
     holes.forEach(hole => {
-        const holeMoth = hole.querySelector(".holeMoth");
-
+        const holeMoths = hole.querySelectorAll(".holeMoth");
+        holeMoths.forEach((holeMoth) => {
         //?? WIP not sure this helps make the animation more organic/erratic
         // Use cubic-bezier timing function for the animation
         const timingFunction = `cubic-bezier(${Math.random()}, ${Math.random()}, ${Math.random()}, ${Math.random()})`;
@@ -600,31 +673,17 @@ function init() {
         // Apply the animation
         holeMoth.style.transition = `left ${duration}s ${timingFunction}, top ${duration}s ${timingFunction}`;
 
-        setInterval(flutter(holeMoth, hole.offsetWidth/2, hole.offsetHeight/2, 200), duration*1000);
-
+        setInterval(()=>flutter(holeMoth, hole.offsetWidth/2, hole.offsetHeight/2, 200), duration*1000);
+        });
     });
-
-    //??Trying to figure out infinite scroll
-    let remove = true;
-    document.onscroll = function() {
-        const halfway = (document.body.scrollHeight)/2;
-        const currentScrollPos = window.scrollY;
-        // Check if the user has scrolled to the bottom of the document
-        if (currentScrollPos >= halfway && remove) {
-            console.log('You have scrolled to the bottom!');
-            // const containers = document.querySelectorAll(".container");
-            // document.body.appendChild(containers[0].cloneNode(true));
-            // containers[0].remove();
-            // remove = false;
-            // setTimeout(()=>remove = true,3000);
-        }
-    };
-
 
     window.addEventListener('scroll', checkScroll);
     // updateSticky();
     // window.addEventListener('resize', updateSticky);
 
+    if (!touchDevice) {
+        burial();
+    }
 }
 
 init();
